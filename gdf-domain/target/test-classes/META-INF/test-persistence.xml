@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="projectPu-test">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<jta-data-source>java:jboss/datasources/testGDFPostgreDS</jta-data-source>
+		<class>com.dgreentec.domain.model.Certificado</class>
+		<class>com.dgreentec.domain.model.Contrato</class>
+		<class>com.dgreentec.domain.model.Empresa</class>
+		<class>com.dgreentec.domain.model.EventoNSU</class>
+		<class>com.dgreentec.infrastructure.model.AbstractEntityVersion</class>
+		<exclude-unlisted-classes>false</exclude-unlisted-classes>
+		<shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+		<properties>
+			<property name="javax.persistence.schema-generation.database.action"
+				value="drop-and-create" />
+			<property name="javax.persistence.schema-generation.scripts.action"
+				value="drop-and-create" />
+			<property name="javax.persistence.schema-generation.scripts.create-target"
+				value="src/main/resources/sql/projectCreate.ddl" />
+			<property name="javax.persistence.schema-generation.scripts.drop-target"
+				value="src/main/resources/sql/projectDrop.ddl" />
+			<property name="javax.persistence.sql-load-script-source"
+				value="src/main/resources/sql/prepare.sql" />
+
+			<!-- Properties for Hibernate -->
+			<property name="hibernate.generate_statistics" value="true" />
+			<property name="hibernate.id.new_generator_mappings" value="true" />
+			<!-- cache -->
+			<property name="hibernate.cache.use_second_level_cache"	value="true" />
+			<property name="hibernate.cache.use_query_cache" value="true" />
+
+		</properties>
+	</persistence-unit>
+</persistence>

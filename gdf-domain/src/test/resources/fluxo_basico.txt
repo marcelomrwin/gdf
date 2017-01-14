@@ -1,0 +1,9 @@
+Se você (destinatário da mercadoria) deseja ou necessita do XML completo, ou seja, assinado e protocolado os passos são:
+
+1. Realizar uma consulta através do DistribuicaoDFe - você vai obter um resumo das notas;
+
+2. Realizar a manifestação de cada uma delas - acusando: Ciência da Operação ou Desconhecimento ou Operação Concluída ou Não Concluída;
+
+3. Realizar uma nova consulta através do DistribuicaoDFe - você vai obter um resumo das novas notas e o XML das notas manifestadas.
+
+Deve-se lembrar que a cada nova consulta usando o método DistribuicaoDFe devemos sempre informar como terceiro parâmetro o valor do ultNSU retornado na execução anterior.

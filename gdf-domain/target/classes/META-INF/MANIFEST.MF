@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Title: Modulo do domￃﾭnio
+Implementation-Version: 0.0.1-SNAPSHOT
+Built-By: marcelosales
+Implementation-Vendor-Id: com.dgreentec
+Build-Jdk: 1.8.0_112
+Created-By: Maven Integration for Eclipse
+Implementation-Vendor: DGreentec
+Dependencies: org.apache.axis2
+

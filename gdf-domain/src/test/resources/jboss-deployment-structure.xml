@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jboss-deployment-structure>
+	<deployment>
+		<dependencies>
+			<module name="org.postgres" />
+			<module name="org.apache.commons.codec" />
+			<module name="org.infinispan" services="import" />
+			<module name="org.apache.cxf.impl">
+				<imports>
+					<include path="META-INF" />
+					<include path="META-INF/cxf" />
+				</imports>
+			</module>
+		</dependencies>
+	</deployment>
+</jboss-deployment-structure>

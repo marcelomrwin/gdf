@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Implementation-Title: gdf-domain: EJB Module
+Implementation-Version: 0.0.1-SNAPSHOT
+Archiver-Version: Plexus Archiver
+Built-By: marcelosales
+Implementation-Vendor-Id: com.dgreentec
+Created-By: Apache Maven 3.3.3
+Build-Jdk: 1.8.0_92
+Implementation-Vendor: DGreentec
+Dependencies: javax.wsdl4j.api,org.apache.httpcomponents,org.apache.nee
+ thi,org.apache.ws.xmlschema,org.apache.commons.codec,org.slf4j,org.jax
+ en 

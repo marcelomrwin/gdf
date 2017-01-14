@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="gdf-pu" transaction-type="JTA">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<jta-data-source>java:jboss/datasources/PostgresGDFDS</jta-data-source>
+		<class>com.dgreentec.domain.model.Certificado</class>
+		<class>com.dgreentec.domain.model.Contrato</class>
+		<class>com.dgreentec.domain.model.Empresa</class>
+		<class>com.dgreentec.domain.model.EventoNSU</class>
+		<class>com.dgreentec.infrastructure.model.AbstractEntityVersion</class>
+		<exclude-unlisted-classes>false</exclude-unlisted-classes>
+		<shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+		<properties>
+
+			<!-- Properties for Hibernate -->
+			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL94Dialect" />			
+			<property name="hibernate.connection.release_mode" value="auto" />
+			<property name="hibernate.integration.envers.enabled" value="false" />			
+
+			<!-- cache -->
+			<property name="hibernate.cache.use_second_level_cache" value="true" />
+			<property name="hibernate.cache.use_query_cache" value="true" />
+
+			<!-- Hibernate Multi Tenancy -->
+			<property name="hibernate.multiTenancy" value="SCHEMA" />
+			<property name="hibernate.multi_tenant_connection_provider" value="com.dgreentec.infrastructure.repository.MultiTenantProvider" />
+			<property name="hibernate.tenant_identifier_resolver" value="com.dgreentec.infrastructure.repository.SchemaResolver" />
+
+			<property name="jboss.entity.manager.factory.jndi.name"	value="java:jboss/gdfEntityManagerFactory" />
+			<property name="jboss.entity.manager.jndi.name" value="java:/gdfEntityManager" />
+		</properties>
+	</persistence-unit>
+</persistence>

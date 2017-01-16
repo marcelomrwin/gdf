@@ -11,7 +11,7 @@ import javax.persistence.criteria.Root;
 
 import com.dgreentec.domain.model.Empresa;
 import com.dgreentec.domain.model.Empresa_;
-import com.dgreentec.domain.model.EventoNSU;
+import com.dgreentec.domain.model.UltimoEventoNSU;
 import com.dgreentec.domain.repository.EmpresaRepository;
 import com.dgreentec.domain.repository.filter.FiltroEmpresa;
 import com.dgreentec.infrastructure.persistence.GenericModelRepository;
@@ -24,22 +24,21 @@ public class EmpresaRepositoryJPABean extends GenericModelRepository<Empresa> im
 	private static final long serialVersionUID = 3753683844072497918L;
 
 	@Override
-	public EventoNSU consultarUltimoNSUParaEmpresa(String cnpj) {
+	public UltimoEventoNSU consultarUltimoNSUParaEmpresa(String cnpj) {
 		CriteriaBuilder cb = createCriteriaBuilder();
-		CriteriaQuery<EventoNSU> cq = cb.createQuery(EventoNSU.class);
+		CriteriaQuery<UltimoEventoNSU> cq = cb.createQuery(UltimoEventoNSU.class);
 		Root<Empresa> root = cq.from(Empresa.class);
 		cq.select(root.get(Empresa_.ultimoNSU));
 		cq.where(cb.equal(root.get(Empresa_.cnpj), cnpj));
-		TypedQuery<EventoNSU> tq = entityManager.createQuery(cq);
-		EventoNSU ultimoNSU = new EventoNSU();
+		TypedQuery<UltimoEventoNSU> tq = entityManager.createQuery(cq);
+		UltimoEventoNSU ultimoNSU = new UltimoEventoNSU();
 		try {
 			ultimoNSU = tq.getSingleResult();
 		} catch (NoResultException nre) {
 			logger.warn("No result");
 		}
-
 		if (ultimoNSU == null)
-			ultimoNSU = new EventoNSU();
+			ultimoNSU = new UltimoEventoNSU();
 
 		return ultimoNSU;
 	}

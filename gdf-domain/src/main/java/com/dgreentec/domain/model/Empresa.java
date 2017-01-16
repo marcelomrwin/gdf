@@ -1,16 +1,25 @@
 package com.dgreentec.domain.model;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
@@ -21,7 +30,7 @@ import com.dgreentec.infrastructure.model.AbstractEntityVersion;
 import com.dgreentec.infrastructure.persistence.converter.UFConverter;
 
 @Entity
-@Table(name = "T_EMPRESA", schema="comum", indexes = { @Index(name = "IDX_NM_EMPRESA", columnList = "TXT_NOME") })
+@Table(name = "T_EMPRESA", indexes = { @Index(name = "IDX_NM_EMPRESA", columnList = "TXT_NOME") })
 @Cacheable
 public class Empresa extends AbstractEntityVersion {
 
@@ -29,7 +38,7 @@ public class Empresa extends AbstractEntityVersion {
 
 	@Id
 	@CNPJ
-	@Column(name = "TXT_CNPJ")
+	@Column(name = "COD_CNPJ")
 	private String cnpj;
 
 	@NotEmpty
@@ -49,7 +58,30 @@ public class Empresa extends AbstractEntityVersion {
 	private Certificado certificado;
 
 	@Embedded
-	private EventoNSU ultimoNSU;
+	private UltimoEventoNSU ultimoNSU;
+
+	@Embedded
+	private BloqueioSefaz bloqueioSefaz;
+
+	@OneToMany(cascade = CascadeType.ALL)
+	@JoinTable(name = "T_EMPRESA_NSU", joinColumns = @JoinColumn(name = "TXT_CNPJ", foreignKey = @ForeignKey(name = "FK_EMPRESA_NSU")), inverseJoinColumns = @JoinColumn(name = "ID_NSU", foreignKey = @ForeignKey(name = "FK_NSU_EMPRESA")), uniqueConstraints = @UniqueConstraint(columnNames = {
+			"TXT_CNPJ", "ID_NSU" }, name = "UNQ_EMPRESA_NSU"))
+	private List<EventoNSU> nsus = new ArrayList<>();
+
+	public boolean existeBloqueioParaEvento() {
+		if (bloqueioSefaz != null) {
+			return bloqueioSefaz.getDtExpiracao().before(new Date());
+		}
+		return false;
+	}
+
+	public void adicionarNSU(EventoNSU evento) {
+		this.nsus.add(evento);
+	}
+
+	public void removerNSU(EventoNSU evento) {
+		this.nsus.remove(evento);
+	}
 
 	public String getCnpj() {
 		return cnpj;
@@ -91,11 +123,13 @@ public class Empresa extends AbstractEntityVersion {
 		this.certificado = certificado;
 	}
 
-	public EventoNSU getUltimoNSU() {
+	public UltimoEventoNSU getUltimoNSU() {
+		if (ultimoNSU==null)return new UltimoEventoNSU();
+
 		return ultimoNSU;
 	}
 
-	public void setUltimoNSU(EventoNSU ultimoNSU) {
+	public void setUltimoNSU(UltimoEventoNSU ultimoNSU) {
 		this.ultimoNSU = ultimoNSU;
 	}
 
@@ -121,7 +155,7 @@ public class Empresa extends AbstractEntityVersion {
 			return this;
 		}
 
-		public Builder comUltimoNSU(EventoNSU pUltimoNSU) {
+		public Builder comUltimoNSU(UltimoEventoNSU pUltimoNSU) {
 			this.entity.setUltimoNSU(pUltimoNSU);
 			return this;
 		}
@@ -131,6 +165,22 @@ public class Empresa extends AbstractEntityVersion {
 			return this;
 		}
 
+	}
+
+	public BloqueioSefaz getBloqueioSefaz() {
+		return bloqueioSefaz;
+	}
+
+	public void setBloqueioSefaz(BloqueioSefaz bloqueioSefaz) {
+		this.bloqueioSefaz = bloqueioSefaz;
+	}
+
+	public List<EventoNSU> getNsus() {
+		return nsus;
+	}
+
+	public void setNsus(List<EventoNSU> nsus) {
+		this.nsus = nsus;
 	}
 
 }

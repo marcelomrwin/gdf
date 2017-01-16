@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bindings version="2.1" xmlns="http://java.sun.com/xml/ns/jaxb">
+  <!--
+
+Este arquivo foi gerado pela Arquitetura JavaTM para Implementação de Referência (JAXB) de Bind XML, v2.2.11 
+Consulte <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
+Todas as modificações neste arquivo serão perdidas após a recompilação do esquema de origem. 
+Gerado em: 2017.01.15 às 08:44:46 PM BRST 
+
+  -->
+  <bindings scd="x-schema::tns" xmlns:tns="http://www.w3.org/2000/09/xmldsig#">
+    <schemaBindings map="false">
+      <package name="com.dgreentec.domain.xsd.procEventoNFe_v100"/>
+    </schemaBindings>
+    <bindings scd="~tns:ReferenceType">
+      <class ref="com.dgreentec.domain.xsd.procEventoNFe_v100.ReferenceType"/>
+    </bindings>
+    <bindings scd="~tns:SignedInfoType">
+      <class ref="com.dgreentec.domain.xsd.procEventoNFe_v100.SignedInfoType"/>
+    </bindings>
+    <bindings scd="~tns:SignatureType">
+      <class ref="com.dgreentec.domain.xsd.procEventoNFe_v100.Signature"/>
+    </bindings>
+    <bindings scd="~tns:SignatureValueType">
+      <class ref="com.dgreentec.domain.xsd.procEventoNFe_v100.SignatureValueType"/>
+    </bindings>
+    <bindings scd="~tns:KeyInfoType">
+      <class ref="com.dgreentec.domain.xsd.procEventoNFe_v100.KeyInfoType"/>
+    </bindings>
+    <bindings scd="~tns:TransformsType">
+      <class ref="com.dgreentec.domain.xsd.procEventoNFe_v100.TransformsType"/>
+    </bindings>
+    <bindings scd="~tns:TransformType">
+      <class ref="com.dgreentec.domain.xsd.procEventoNFe_v100.TransformType"/>
+    </bindings>
+    <bindings scd="~tns:X509DataType">
+      <class ref="com.dgreentec.domain.xsd.procEventoNFe_v100.X509DataType"/>
+    </bindings>
+  </bindings>
+  <bindings scd="x-schema::tns" xmlns:tns="http://www.portalfiscal.inf.br/nfe">
+    <schemaBindings map="false">
+      <package name="com.dgreentec.domain.xsd.procEventoNFe_v100"/>
+    </schemaBindings>
+    <bindings scd="~tns:TRetEvento">
+      <class ref="com.dgreentec.domain.xsd.procEventoNFe_v100.TRetEvento"/>
+    </bindings>
+    <bindings scd="~tns:TEvento">
+      <class ref="com.dgreentec.domain.xsd.procEventoNFe_v100.TEvento"/>
+    </bindings>
+    <bindings scd="~tns:TProcEvento">
+      <class ref="com.dgreentec.domain.xsd.procEventoNFe_v100.ProcEventoNFe"/>
+    </bindings>
+    <bindings scd="~tns:TEnvEvento">
+      <class ref="com.dgreentec.domain.xsd.procEventoNFe_v100.TEnvEvento"/>
+    </bindings>
+    <bindings scd="~tns:TRetEnvEvento">
+      <class ref="com.dgreentec.domain.xsd.procEventoNFe_v100.TRetEnvEvento"/>
+    </bindings>
+    <bindings scd="~tns:TUf">
+      <typesafeEnumClass ref="com.dgreentec.domain.xsd.procEventoNFe_v100.TUf"/>
+    </bindings>
+    <bindings scd="~tns:TUfEmi">
+      <typesafeEnumClass ref="com.dgreentec.domain.xsd.procEventoNFe_v100.TUfEmi"/>
+    </bindings>
+  </bindings>
+</bindings>
+

@@ -24,15 +24,7 @@
 			<property name="hibernate.generate_statistics" value="false" />
 			<property name="hibernate.id.new_generator_mappings" value="true" />
 
-			<!-- Hibernate Multi Tenancy -->
-			<property name="hibernate.multiTenancy" value="SCHEMA" />
-			<property name="hibernate.multi_tenant_connection_provider"
-				value="com.dgreentec.infrastructure.repository.MultiTenantProvider" />
-			<property name="hibernate.tenant_identifier_resolver"
-				value="com.dgreentec.infrastructure.repository.SchemaResolver" />
-
-			<property name="jboss.entity.manager.factory.jndi.name"
-				value="java:jboss/gdfEntityManagerFactory" />
+			<property name="jboss.entity.manager.factory.jndi.name"	value="java:jboss/gdfEntityManagerFactory" />
 			<property name="jboss.entity.manager.jndi.name" value="java:/gdfEntityManager" />
 
 		</properties>

@@ -22,10 +22,10 @@ import com.dgreentec.domain.model.TipoAmbienteEnum;
 public @interface ProcessadorEventoDocumento {
 
 	@Nonbinding
-	String cnpj() default "";
+	long idContrato() default 0;
 
 	@Nonbinding
-	long ultimoNSU() default 0;
+	String cnpj() default "";
 
 	@Nonbinding
 	TipoAmbienteEnum ambiente() default TipoAmbienteEnum.HOMOLOGACAO;

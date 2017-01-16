@@ -6,6 +6,9 @@
 
 	<interceptors>
 		<interceptor>
+			<interceptor-class>com.dgreentec.infrastructure.interceptor.EJBTransactionInterceptor</interceptor-class>
+		</interceptor>
+		<interceptor>
 			<interceptor-class>com.dgreentec.infrastructure.interceptor.TransactionMultitenancyInterceptor</interceptor-class>
 		</interceptor>
 	</interceptors>
@@ -13,8 +16,13 @@
 	<assembly-descriptor>
 		<interceptor-binding>
 			<ejb-name>*</ejb-name>
+			<interceptor-class>com.dgreentec.infrastructure.interceptor.EJBTransactionInterceptor</interceptor-class>
+		</interceptor-binding>
+		<interceptor-binding>
+			<ejb-name>*</ejb-name>
 			<interceptor-class>com.dgreentec.infrastructure.interceptor.TransactionMultitenancyInterceptor</interceptor-class>
 		</interceptor-binding>
 	</assembly-descriptor>
+
 
 </ejb-jar>

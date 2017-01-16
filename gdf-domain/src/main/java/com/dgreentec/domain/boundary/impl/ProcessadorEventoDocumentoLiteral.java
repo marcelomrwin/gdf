@@ -8,15 +8,15 @@ public class ProcessadorEventoDocumentoLiteral extends AnnotationLiteral<Process
 
 	private static final long serialVersionUID = 8759615828097805991L;
 
-	private String cnpj;
+	private long idContrato;
 
-	private long nsu;
+	private String cnpj;
 
 	private TipoAmbienteEnum amb;
 
-	public ProcessadorEventoDocumentoLiteral(String cnpj, long nsu, TipoAmbienteEnum amb) {
+	public ProcessadorEventoDocumentoLiteral(long idContrato, String cnpj, TipoAmbienteEnum amb) {
+		this.idContrato = idContrato;
 		this.cnpj = cnpj;
-		this.nsu = nsu;
 		this.amb = amb;
 	}
 
@@ -26,13 +26,13 @@ public class ProcessadorEventoDocumentoLiteral extends AnnotationLiteral<Process
 	}
 
 	@Override
-	public long ultimoNSU() {
-		return nsu;
+	public TipoAmbienteEnum ambiente() {
+		return this.amb;
 	}
 
 	@Override
-	public TipoAmbienteEnum ambiente() {
-		return this.amb;
+	public long idContrato() {
+		return idContrato;
 	}
 
 }

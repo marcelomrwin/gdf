@@ -28,7 +28,7 @@ import com.dgreentec.infrastructure.model.AbstractEntityBuilder;
 import com.dgreentec.infrastructure.model.AbstractEntityVersion;
 
 @Entity
-@Table(name = "T_CERTIFICADO",schema="comum")
+@Table(name = "T_CERTIFICADO")
 @Cacheable
 public class Certificado extends AbstractEntityVersion {
 

@@ -245,6 +245,7 @@
 								<goals>
 									<goal>wsdl2code</goal>
 								</goals>
+								<phase>clean</phase>
 								<configuration>
 									<wsdlFile>${project.build.resources[0].directory}/wsdl/NFeDistribuicaoDFe.wsdl</wsdlFile>
 									<outputDirectory>src/main/java</outputDirectory>
@@ -257,6 +258,7 @@
 								<goals>
 									<goal>wsdl2code</goal>
 								</goals>
+								<phase>clean</phase>
 								<configuration>
 									<wsdlFile>${project.build.resources[0].directory}/wsdl/NfeStatusServico2.wsdl</wsdlFile>
 									<outputDirectory>src/main/java</outputDirectory>
@@ -268,10 +270,43 @@
 								<goals>
 									<goal>wsdl2code</goal>
 								</goals>
+								<phase>clean</phase>
 								<configuration>
 									<wsdlFile>${project.build.resources[0].directory}/wsdl/RecepcaoEvento.wsdl</wsdlFile>
 									<outputDirectory>src/main/java</outputDirectory>
 									<skipBuildXML>true</skipBuildXML>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.8</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<phase>clean</phase>
+								<configuration>
+									<target>
+										<echo>Executando Maven Ant no caminho ${basedir}</echo>
+										<echo>Source está mapeado para
+											${project.build.sourceDirectory}</echo>
+										<move todir="${project.build.sourceDirectory}" verbose="true"
+											overwrite="true" includeEmptyDirs="true">
+											<fileset dir="${project.build.sourceDirectory}/src">
+												<include name="**/*" />
+											</fileset>
+										</move>
+										<delete includeEmptyDirs="true" verbose="true">
+											<fileset dir="${project.build.sourceDirectory}/src" />
+										</delete>
+										<delete includeEmptyDirs="true" verbose="true">
+											<fileset dir="${basedir}/src/main/java/META-INF" />
+										</delete>
+									</target>
 								</configuration>
 							</execution>
 						</executions>
@@ -493,36 +528,7 @@
 						</executions>
 
 					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.8</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>run</goal>
-								</goals>
-								<phase>package</phase>
-								<configuration>
-									<target>
-										<echo>${basedir}</echo>
-										<move todir="${project.build.sourceDirectory}" verbose="true"
-											overwrite="true" includeEmptyDirs="true">
-											<fileset dir="${project.build.sourceDirectory}/src">
-												<include name="**/*" />
-											</fileset>
-										</move>
-										<delete includeEmptyDirs="true" verbose="true">
-											<fileset dir="${project.build.sourceDirectory}/src" />
-										</delete>
-										<delete includeEmptyDirs="true" verbose="true">
-											<fileset dir="${basedir}/src/main/java/META-INF" />
-										</delete>
-									</target>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
+
 				</plugins>
 			</build>
 		</profile>

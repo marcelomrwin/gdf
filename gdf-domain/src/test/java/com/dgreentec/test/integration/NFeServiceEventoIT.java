@@ -2,6 +2,9 @@ package com.dgreentec.test.integration;
 
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
@@ -56,20 +59,15 @@ public class NFeServiceEventoIT extends AbstractTestCase {
 
 	@Test
 	@InSequence(1)
-	public void consultarEventosDoContrato() throws NfeException {
+	public void consultarEventosDoContrato() throws NfeException, InterruptedException, ExecutionException {
 		Contrato contrato = contratoService.consultarContratoPorIdContrato(1L);
 		assertThat(contrato, is(not(nullValue())));
 		assertThat(contrato.getEmpresas(), is(not(Matchers.empty())));
 
 		TipoAmbienteEnum ambiente = TipoAmbienteEnum.HOMOLOGACAO;
 
-		List<EventoDocumento> eventos = nfeService.consultarEventosPorContrato(contrato, ambiente);
+		nfeService.processarEventosPorContrato(contrato, ambiente);
 
-		assertThat(eventos, is(not(nullValue())));
-		assertThat(eventos, is(not(Matchers.empty())));
-
-		for (EventoDocumento eventoDocumento : eventos) {
-			log(eventoDocumento.getNsuFormatado(), eventoDocumento.getJaxbObject().toString());
-		}
+		TimeUnit.SECONDS.sleep(30);
 	}
 }

@@ -23484,6 +23484,237 @@ public class TNFe
                  *   &lt;complexContent&gt;
                  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
                  *       &lt;sequence&gt;
+                 *         &lt;element name="nDraw" minOccurs="0"&gt;
+                 *           &lt;simpleType&gt;
+                 *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+                 *               &lt;whiteSpace value="preserve"/&gt;
+                 *               &lt;pattern value="[0-9]{0,11}"/&gt;
+                 *             &lt;/restriction&gt;
+                 *           &lt;/simpleType&gt;
+                 *         &lt;/element&gt;
+                 *         &lt;element name="exportInd" minOccurs="0"&gt;
+                 *           &lt;complexType&gt;
+                 *             &lt;complexContent&gt;
+                 *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+                 *                 &lt;sequence&gt;
+                 *                   &lt;element name="nRE"&gt;
+                 *                     &lt;simpleType&gt;
+                 *                       &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+                 *                         &lt;whiteSpace value="preserve"/&gt;
+                 *                         &lt;pattern value="[0-9]{0,12}"/&gt;
+                 *                       &lt;/restriction&gt;
+                 *                     &lt;/simpleType&gt;
+                 *                   &lt;/element&gt;
+                 *                   &lt;element name="chNFe" type="{http://www.portalfiscal.inf.br/nfe}TChNFe"/&gt;
+                 *                   &lt;element name="qExport" type="{http://www.portalfiscal.inf.br/nfe}TDec_1104v"/&gt;
+                 *                 &lt;/sequence&gt;
+                 *               &lt;/restriction&gt;
+                 *             &lt;/complexContent&gt;
+                 *           &lt;/complexType&gt;
+                 *         &lt;/element&gt;
+                 *       &lt;/sequence&gt;
+                 *     &lt;/restriction&gt;
+                 *   &lt;/complexContent&gt;
+                 * &lt;/complexType&gt;
+                 * </pre>
+                 * 
+                 * 
+                 */
+                @XmlAccessorType(XmlAccessType.FIELD)
+                @XmlType(name = "", propOrder = {
+                    "nDraw",
+                    "exportInd"
+                })
+                public static class DetExport
+                    implements Serializable
+                {
+
+                    private final static long serialVersionUID = -1L;
+                    protected String nDraw;
+                    protected TNFe.InfNFe.Det.Prod.DetExport.ExportInd exportInd;
+
+                    /**
+                     * Obtém o valor da propriedade nDraw.
+                     * 
+                     * @return
+                     *     possible object is
+                     *     {@link String }
+                     *     
+                     */
+                    public String getNDraw() {
+                        return nDraw;
+                    }
+
+                    /**
+                     * Define o valor da propriedade nDraw.
+                     * 
+                     * @param value
+                     *     allowed object is
+                     *     {@link String }
+                     *     
+                     */
+                    public void setNDraw(String value) {
+                        this.nDraw = value;
+                    }
+
+                    /**
+                     * Obtém o valor da propriedade exportInd.
+                     * 
+                     * @return
+                     *     possible object is
+                     *     {@link TNFe.InfNFe.Det.Prod.DetExport.ExportInd }
+                     *     
+                     */
+                    public TNFe.InfNFe.Det.Prod.DetExport.ExportInd getExportInd() {
+                        return exportInd;
+                    }
+
+                    /**
+                     * Define o valor da propriedade exportInd.
+                     * 
+                     * @param value
+                     *     allowed object is
+                     *     {@link TNFe.InfNFe.Det.Prod.DetExport.ExportInd }
+                     *     
+                     */
+                    public void setExportInd(TNFe.InfNFe.Det.Prod.DetExport.ExportInd value) {
+                        this.exportInd = value;
+                    }
+
+
+                    /**
+                     * <p>Classe Java de anonymous complex type.
+                     * 
+                     * <p>O seguinte fragmento do esquema especifica o conteúdo esperado contido dentro desta classe.
+                     * 
+                     * <pre>
+                     * &lt;complexType&gt;
+                     *   &lt;complexContent&gt;
+                     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+                     *       &lt;sequence&gt;
+                     *         &lt;element name="nRE"&gt;
+                     *           &lt;simpleType&gt;
+                     *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+                     *               &lt;whiteSpace value="preserve"/&gt;
+                     *               &lt;pattern value="[0-9]{0,12}"/&gt;
+                     *             &lt;/restriction&gt;
+                     *           &lt;/simpleType&gt;
+                     *         &lt;/element&gt;
+                     *         &lt;element name="chNFe" type="{http://www.portalfiscal.inf.br/nfe}TChNFe"/&gt;
+                     *         &lt;element name="qExport" type="{http://www.portalfiscal.inf.br/nfe}TDec_1104v"/&gt;
+                     *       &lt;/sequence&gt;
+                     *     &lt;/restriction&gt;
+                     *   &lt;/complexContent&gt;
+                     * &lt;/complexType&gt;
+                     * </pre>
+                     * 
+                     * 
+                     */
+                    @XmlAccessorType(XmlAccessType.FIELD)
+                    @XmlType(name = "", propOrder = {
+                        "nre",
+                        "chNFe",
+                        "qExport"
+                    })
+                    public static class ExportInd
+                        implements Serializable
+                    {
+
+                        private final static long serialVersionUID = -1L;
+                        @XmlElement(name = "nRE", required = true)
+                        protected String nre;
+                        @XmlElement(required = true)
+                        protected String chNFe;
+                        @XmlElement(required = true)
+                        protected String qExport;
+
+                        /**
+                         * Obtém o valor da propriedade nre.
+                         * 
+                         * @return
+                         *     possible object is
+                         *     {@link String }
+                         *     
+                         */
+                        public String getNRE() {
+                            return nre;
+                        }
+
+                        /**
+                         * Define o valor da propriedade nre.
+                         * 
+                         * @param value
+                         *     allowed object is
+                         *     {@link String }
+                         *     
+                         */
+                        public void setNRE(String value) {
+                            this.nre = value;
+                        }
+
+                        /**
+                         * Obtém o valor da propriedade chNFe.
+                         * 
+                         * @return
+                         *     possible object is
+                         *     {@link String }
+                         *     
+                         */
+                        public String getChNFe() {
+                            return chNFe;
+                        }
+
+                        /**
+                         * Define o valor da propriedade chNFe.
+                         * 
+                         * @param value
+                         *     allowed object is
+                         *     {@link String }
+                         *     
+                         */
+                        public void setChNFe(String value) {
+                            this.chNFe = value;
+                        }
+
+                        /**
+                         * Obtém o valor da propriedade qExport.
+                         * 
+                         * @return
+                         *     possible object is
+                         *     {@link String }
+                         *     
+                         */
+                        public String getQExport() {
+                            return qExport;
+                        }
+
+                        /**
+                         * Define o valor da propriedade qExport.
+                         * 
+                         * @param value
+                         *     allowed object is
+                         *     {@link String }
+                         *     
+                         */
+                        public void setQExport(String value) {
+                            this.qExport = value;
+                        }
+
+                    }
+
+                }
+
+
+                /**
+                 * <p>Classe Java de anonymous complex type.
+                 * 
+                 * <p>O seguinte fragmento do esquema especifica o conteúdo esperado contido dentro desta classe.
+                 * 
+                 * <pre>
+                 * &lt;complexType&gt;
+                 *   &lt;complexContent&gt;
+                 *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+                 *       &lt;sequence&gt;
                  *         &lt;element name="nDI"&gt;
                  *           &lt;simpleType&gt;
                  *             &lt;restriction base="{http://www.portalfiscal.inf.br/nfe}TString"&gt;
@@ -24126,237 +24357,6 @@ public class TNFe
                          */
                         public void setNDraw(String value) {
                             this.nDraw = value;
-                        }
-
-                    }
-
-                }
-
-
-                /**
-                 * <p>Classe Java de anonymous complex type.
-                 * 
-                 * <p>O seguinte fragmento do esquema especifica o conteúdo esperado contido dentro desta classe.
-                 * 
-                 * <pre>
-                 * &lt;complexType&gt;
-                 *   &lt;complexContent&gt;
-                 *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-                 *       &lt;sequence&gt;
-                 *         &lt;element name="nDraw" minOccurs="0"&gt;
-                 *           &lt;simpleType&gt;
-                 *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
-                 *               &lt;whiteSpace value="preserve"/&gt;
-                 *               &lt;pattern value="[0-9]{0,11}"/&gt;
-                 *             &lt;/restriction&gt;
-                 *           &lt;/simpleType&gt;
-                 *         &lt;/element&gt;
-                 *         &lt;element name="exportInd" minOccurs="0"&gt;
-                 *           &lt;complexType&gt;
-                 *             &lt;complexContent&gt;
-                 *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-                 *                 &lt;sequence&gt;
-                 *                   &lt;element name="nRE"&gt;
-                 *                     &lt;simpleType&gt;
-                 *                       &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
-                 *                         &lt;whiteSpace value="preserve"/&gt;
-                 *                         &lt;pattern value="[0-9]{0,12}"/&gt;
-                 *                       &lt;/restriction&gt;
-                 *                     &lt;/simpleType&gt;
-                 *                   &lt;/element&gt;
-                 *                   &lt;element name="chNFe" type="{http://www.portalfiscal.inf.br/nfe}TChNFe"/&gt;
-                 *                   &lt;element name="qExport" type="{http://www.portalfiscal.inf.br/nfe}TDec_1104v"/&gt;
-                 *                 &lt;/sequence&gt;
-                 *               &lt;/restriction&gt;
-                 *             &lt;/complexContent&gt;
-                 *           &lt;/complexType&gt;
-                 *         &lt;/element&gt;
-                 *       &lt;/sequence&gt;
-                 *     &lt;/restriction&gt;
-                 *   &lt;/complexContent&gt;
-                 * &lt;/complexType&gt;
-                 * </pre>
-                 * 
-                 * 
-                 */
-                @XmlAccessorType(XmlAccessType.FIELD)
-                @XmlType(name = "", propOrder = {
-                    "nDraw",
-                    "exportInd"
-                })
-                public static class DetExport
-                    implements Serializable
-                {
-
-                    private final static long serialVersionUID = -1L;
-                    protected String nDraw;
-                    protected TNFe.InfNFe.Det.Prod.DetExport.ExportInd exportInd;
-
-                    /**
-                     * Obtém o valor da propriedade nDraw.
-                     * 
-                     * @return
-                     *     possible object is
-                     *     {@link String }
-                     *     
-                     */
-                    public String getNDraw() {
-                        return nDraw;
-                    }
-
-                    /**
-                     * Define o valor da propriedade nDraw.
-                     * 
-                     * @param value
-                     *     allowed object is
-                     *     {@link String }
-                     *     
-                     */
-                    public void setNDraw(String value) {
-                        this.nDraw = value;
-                    }
-
-                    /**
-                     * Obtém o valor da propriedade exportInd.
-                     * 
-                     * @return
-                     *     possible object is
-                     *     {@link TNFe.InfNFe.Det.Prod.DetExport.ExportInd }
-                     *     
-                     */
-                    public TNFe.InfNFe.Det.Prod.DetExport.ExportInd getExportInd() {
-                        return exportInd;
-                    }
-
-                    /**
-                     * Define o valor da propriedade exportInd.
-                     * 
-                     * @param value
-                     *     allowed object is
-                     *     {@link TNFe.InfNFe.Det.Prod.DetExport.ExportInd }
-                     *     
-                     */
-                    public void setExportInd(TNFe.InfNFe.Det.Prod.DetExport.ExportInd value) {
-                        this.exportInd = value;
-                    }
-
-
-                    /**
-                     * <p>Classe Java de anonymous complex type.
-                     * 
-                     * <p>O seguinte fragmento do esquema especifica o conteúdo esperado contido dentro desta classe.
-                     * 
-                     * <pre>
-                     * &lt;complexType&gt;
-                     *   &lt;complexContent&gt;
-                     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-                     *       &lt;sequence&gt;
-                     *         &lt;element name="nRE"&gt;
-                     *           &lt;simpleType&gt;
-                     *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
-                     *               &lt;whiteSpace value="preserve"/&gt;
-                     *               &lt;pattern value="[0-9]{0,12}"/&gt;
-                     *             &lt;/restriction&gt;
-                     *           &lt;/simpleType&gt;
-                     *         &lt;/element&gt;
-                     *         &lt;element name="chNFe" type="{http://www.portalfiscal.inf.br/nfe}TChNFe"/&gt;
-                     *         &lt;element name="qExport" type="{http://www.portalfiscal.inf.br/nfe}TDec_1104v"/&gt;
-                     *       &lt;/sequence&gt;
-                     *     &lt;/restriction&gt;
-                     *   &lt;/complexContent&gt;
-                     * &lt;/complexType&gt;
-                     * </pre>
-                     * 
-                     * 
-                     */
-                    @XmlAccessorType(XmlAccessType.FIELD)
-                    @XmlType(name = "", propOrder = {
-                        "nre",
-                        "chNFe",
-                        "qExport"
-                    })
-                    public static class ExportInd
-                        implements Serializable
-                    {
-
-                        private final static long serialVersionUID = -1L;
-                        @XmlElement(name = "nRE", required = true)
-                        protected String nre;
-                        @XmlElement(required = true)
-                        protected String chNFe;
-                        @XmlElement(required = true)
-                        protected String qExport;
-
-                        /**
-                         * Obtém o valor da propriedade nre.
-                         * 
-                         * @return
-                         *     possible object is
-                         *     {@link String }
-                         *     
-                         */
-                        public String getNRE() {
-                            return nre;
-                        }
-
-                        /**
-                         * Define o valor da propriedade nre.
-                         * 
-                         * @param value
-                         *     allowed object is
-                         *     {@link String }
-                         *     
-                         */
-                        public void setNRE(String value) {
-                            this.nre = value;
-                        }
-
-                        /**
-                         * Obtém o valor da propriedade chNFe.
-                         * 
-                         * @return
-                         *     possible object is
-                         *     {@link String }
-                         *     
-                         */
-                        public String getChNFe() {
-                            return chNFe;
-                        }
-
-                        /**
-                         * Define o valor da propriedade chNFe.
-                         * 
-                         * @param value
-                         *     allowed object is
-                         *     {@link String }
-                         *     
-                         */
-                        public void setChNFe(String value) {
-                            this.chNFe = value;
-                        }
-
-                        /**
-                         * Obtém o valor da propriedade qExport.
-                         * 
-                         * @return
-                         *     possible object is
-                         *     {@link String }
-                         *     
-                         */
-                        public String getQExport() {
-                            return qExport;
-                        }
-
-                        /**
-                         * Define o valor da propriedade qExport.
-                         * 
-                         * @param value
-                         *     allowed object is
-                         *     {@link String }
-                         *     
-                         */
-                        public void setQExport(String value) {
-                            this.qExport = value;
                         }
 
                     }

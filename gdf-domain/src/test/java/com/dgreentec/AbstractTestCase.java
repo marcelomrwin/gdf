@@ -27,7 +27,7 @@ import com.dgreentec.infrastructure.exception.InfraException;
 import com.dgreentec.infrastructure.interceptor.TransactionMultitenancyInterceptor;
 import com.dgreentec.infrastructure.model.AbstractEntityVersion;
 import com.dgreentec.infrastructure.persistence.RepositoryJPA;
-import com.dgreentec.infrastructure.persistence.pagination.PagedList;
+
 import com.dgreentec.infrastructure.repository.MultiTenantProvider;
 import com.dgreentec.infrastructure.repository.SchemaResolver;
 import com.dgreentec.infrastructure.service.boundary.AbstractBoundary;
@@ -46,7 +46,9 @@ public abstract class AbstractTestCase {
 	public TestCasePrinterRule pr = new TestCasePrinterRule(System.out);
 
 	public enum DATABASE {
-		POSTGRES_DESENV("test-persistence.xml"), POSTGRES_DESENV_NO_DROP("test-persistence-no-drop.xml");
+		POSTGRES_CREATE("test-persistence-create.xml"), POSTGRES_DESENV("test-persistence.xml"), POSTGRES_DESENV_MULTI_TENANT(
+				"test-persistence-multi-tenant.xml"), POSTGRES_DESENV_NO_DROP(
+						"test-persistence-no-drop.xml"), POSTGRES_DESENV_NO_DROP_MULTI_TENANT("test-persistence-no-drop-multi-tenant.xml");
 
 		protected final String persistence;
 
@@ -70,15 +72,29 @@ public abstract class AbstractTestCase {
 				testArchive.merge(archive);
 			}
 
-		testArchive
-				.addPackages(true, AbstractTestCase.class.getPackage(), ConfigurationManager.class.getPackage(),
-						InfraException.class.getPackage(), TransactionMultitenancyInterceptor.class.getPackage(),
-						MultiTenantProvider.class.getPackage(), AbstractEntityVersion.class.getPackage(), RepositoryJPA.class.getPackage(),
-						SchemaResolver.class.getPackage(), ThreadLocalCert.class.getPackage(), JaxbUtils.class.getPackage(),
-						NFeDistribuicaoDFeStub.class.getPackage(), NfeStatusServico2Stub.class.getPackage(),
-						RecepcaoEventoStub.class.getPackage(), AbstractBoundary.class.getPackage())
+		testArchive.addPackages(true, "br.inf.portalfiscal.www.nfe.wsdl", "com.dgreentec").addAsResource("log4j.xml").addAsResource("sql")
 				.addAsResource("META-INF/" + pDataBase.getPersistence(), "META-INF/persistence.xml").addAsResource("META-INF/beans.xml")
 				.addAsResource("config").addAsResource("keystore").addAsResource("META-INF/orm.xml").addAsResource("META-INF/ejb-jar.xml");// .addAsResource("META-INF/TEST-MANIFEST.MF","META-INF/MANIFEST.MF");
+
+		return testArchive;
+	}
+
+	protected static JavaArchive getEJBDeployCreate(String... deps) {
+		JavaArchive testArchive = ShrinkWrap.create(JavaArchive.class);
+		File[] libs = getDependencies(true, deps);
+
+		if (libs != null && libs.length > 0)
+			for (File file : libs) {
+				JavaArchive archive = ShrinkWrap.createFromZipFile(JavaArchive.class, file);
+				testArchive.merge(archive);
+			}
+
+		testArchive
+				.addPackages(true, "com.dgreentec.domain.model", "com.dgreentec.infrastructure.model",
+						"com.dgreentec.infrastructure.exception", "com.dgreentec.infrastructure.persistence.converter")
+				.addAsResource("log4j.xml")
+				.addAsResource("META-INF/" + DATABASE.POSTGRES_CREATE.getPersistence(), "META-INF/persistence.xml")
+				.addAsResource("META-INF/orm.xml");
 
 		return testArchive;
 	}
@@ -192,15 +208,15 @@ public abstract class AbstractTestCase {
 		deps.add("org.apache.axis2:axis2-transport-local:1.7.4");
 		deps.add("org.apache.axis2:axis2-adb:1.7.4");
 
-//		deps.add("org.apache.ws.commons.axiom:axiom-api:1.2.20");
-//		deps.add("org.apache.ws.commons.axiom:axiom-impl:1.2.20");
-//		deps.add("commons-httpclient:commons-httpclient:3.1");
-//		deps.add("org.apache.woden:woden-core:1.0M10");
-//		deps.add("commons-fileupload:commons-fileupload:1.3.1");
-//		deps.add("wsdl4j:wsdl4j:1.6.3");
-//		deps.add("org.apache.geronimo.specs:geronimo-stax-api_1.0_spec:1.0.1");
-//		deps.add("org.codehaus.woodstox:stax2-api:4.0.0");
-//		deps.add("org.codehaus.woodstox:woodstox-core-asl:4.2.0");
+		//		deps.add("org.apache.ws.commons.axiom:axiom-api:1.2.20");
+		//		deps.add("org.apache.ws.commons.axiom:axiom-impl:1.2.20");
+		//		deps.add("commons-httpclient:commons-httpclient:3.1");
+		//		deps.add("org.apache.woden:woden-core:1.0M10");
+		//		deps.add("commons-fileupload:commons-fileupload:1.3.1");
+		//		deps.add("wsdl4j:wsdl4j:1.6.3");
+		//		deps.add("org.apache.geronimo.specs:geronimo-stax-api_1.0_spec:1.0.1");
+		//		deps.add("org.codehaus.woodstox:stax2-api:4.0.0");
+		//		deps.add("org.codehaus.woodstox:woodstox-core-asl:4.2.0");
 
 		for (String dp : addDeps) {
 			deps.add(dp);
@@ -218,34 +234,21 @@ public abstract class AbstractTestCase {
 		deps.add("org.apache.axis2:axis2-transport-local:1.7.4");
 		deps.add("org.apache.axis2:axis2-adb:1.7.4");
 
-//		deps.add("org.apache.ws.commons.axiom:axiom-api:1.2.20");
-//		deps.add("org.apache.ws.commons.axiom:axiom-impl:1.2.20");
-//		deps.add("commons-httpclient:commons-httpclient:3.1");
-//		deps.add("org.apache.woden:woden-core:1.0M10");
-//		deps.add("commons-fileupload:commons-fileupload:1.3.1");
-//		deps.add("wsdl4j:wsdl4j:1.6.3");
-//		deps.add("org.apache.geronimo.specs:geronimo-stax-api_1.0_spec:1.0.1");
-//		deps.add("org.codehaus.woodstox:stax2-api:4.0.0");
-//		deps.add("org.codehaus.woodstox:woodstox-core-asl:4.2.0");
+		//		deps.add("org.apache.ws.commons.axiom:axiom-api:1.2.20");
+		//		deps.add("org.apache.ws.commons.axiom:axiom-impl:1.2.20");
+		//		deps.add("commons-httpclient:commons-httpclient:3.1");
+		//		deps.add("org.apache.woden:woden-core:1.0M10");
+		//		deps.add("commons-fileupload:commons-fileupload:1.3.1");
+		//		deps.add("wsdl4j:wsdl4j:1.6.3");
+		//		deps.add("org.apache.geronimo.specs:geronimo-stax-api_1.0_spec:1.0.1");
+		//		deps.add("org.codehaus.woodstox:stax2-api:4.0.0");
+		//		deps.add("org.codehaus.woodstox:woodstox-core-asl:4.2.0");
 
 		for (String dp : addDeps) {
 			deps.add(dp);
 		}
 
 		return deps;
-	}
-
-	protected void validarPageListComTamanho(PagedList<?> pagedList, Long qtd) {
-		assertThat(pagedList.getResults(), is(not(nullValue())));
-		assertThat(pagedList.isEmpty(), is(false));
-		assertThat(pagedList.getQtdResults(), is(qtd));
-		assertThat(pagedList.getCurrentSize(), is(qtd.intValue()));
-	}
-
-	protected void validarPagedListVazia(PagedList<?> pagedList) {
-		assertThat(pagedList.getResults(), is(not(nullValue())));
-		assertThat(pagedList.isEmpty(), is(true));
-		assertThat(pagedList.getQtdResults(), is(0L));
 	}
 
 	protected File getResourceFolder() {

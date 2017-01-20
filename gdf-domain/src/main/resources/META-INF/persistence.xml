@@ -11,26 +11,29 @@
 		<class>com.dgreentec.domain.model.DocumentoFiscal</class>
 		<class>com.dgreentec.domain.model.Empresa</class>
 		<class>com.dgreentec.domain.model.EventoNSU</class>
+		<class>com.dgreentec.domain.model.LogEventoNotificacao</class>
 		<class>com.dgreentec.domain.model.LoteEvento</class>
+		<class>com.dgreentec.domain.model.Tenant</class>
 		<class>com.dgreentec.domain.model.UltimoEventoNSU</class>
+		<class>com.dgreentec.domain.model.Usuario</class>
 		<class>com.dgreentec.infrastructure.model.AbstractEntityVersion</class>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 		<shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
 		<properties>
 
 			<!-- Properties for Hibernate -->
-			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL94Dialect" />			
+			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL94Dialect" />
 			<property name="hibernate.connection.release_mode" value="auto" />
-			<property name="hibernate.integration.envers.enabled" value="false" />			
+			<property name="hibernate.integration.envers.enabled" value="false" />
 
 			<!-- cache -->
 			<property name="hibernate.cache.use_second_level_cache" value="true" />
 			<property name="hibernate.cache.use_query_cache" value="true" />
 
 			<!-- Hibernate Multi Tenancy -->
-			<property name="hibernate.multiTenancy" value="SCHEMA" />
-			<property name="hibernate.multi_tenant_connection_provider" value="com.dgreentec.infrastructure.repository.MultiTenantProvider" />
-			<property name="hibernate.tenant_identifier_resolver" value="com.dgreentec.infrastructure.repository.SchemaResolver" />
+<!-- 			<property name="hibernate.multiTenancy" value="SCHEMA" /> -->
+<!-- 			<property name="hibernate.multi_tenant_connection_provider" value="com.dgreentec.infrastructure.repository.MultiTenantProvider" /> -->
+<!-- 			<property name="hibernate.tenant_identifier_resolver" value="com.dgreentec.infrastructure.repository.SchemaResolver" /> -->
 
 			<property name="jboss.entity.manager.factory.jndi.name"	value="java:jboss/gdfEntityManagerFactory" />
 			<property name="jboss.entity.manager.jndi.name" value="java:/gdfEntityManager" />

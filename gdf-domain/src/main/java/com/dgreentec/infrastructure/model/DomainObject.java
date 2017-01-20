@@ -1,12 +1,12 @@
 package com.dgreentec.infrastructure.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public interface DomainObject extends Serializable {
 
-	Date getDataUltimaAlteracao();
+	LocalDateTime getDataUltimaAlteracao();
 
-	Date getDataCriacao();
+	LocalDateTime getDataCriacao();
 
 }

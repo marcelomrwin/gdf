@@ -133,14 +133,14 @@ public abstract class GenericModelRepository<T extends AbstractEntityVersion> ex
 				Column cl = field.getAnnotation(Column.class);
 				//
 				if (columnNames.contains(cl.name())) {
-					CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+					CriteriaBuilder cb = entityManager.get().getCriteriaBuilder();
 					CriteriaQuery<Serializable> cq = cb.createQuery(Serializable.class);
 					Root<T> from = cq.from(entityClass);
 					try {
 						Object fieldValue = entity.getFieldValue(field.getName());
 						Predicate where = cb.equal(from.get(field.getName()), fieldValue);
 						cq.select(from.get(entity.getIdField().getName())).where(where);
-						TypedQuery<Serializable> query = entityManager.createQuery(cq);
+						TypedQuery<Serializable> query = entityManager.get().createQuery(cq);
 						List<Serializable> result = query.getResultList();
 						if (!specification.validate(result, entity))
 							throw new BusinessException(operationKey, new String[] { entityClass.getSimpleName() },
@@ -185,7 +185,7 @@ public abstract class GenericModelRepository<T extends AbstractEntityVersion> ex
 	public T atualizar(T entity, boolean flush) {
 		super.update(entity);
 		if (flush)
-			entityManager.flush();
+			entityManager.get().flush();
 
 		entity = consultarPorChave(entity.getIdValue());
 

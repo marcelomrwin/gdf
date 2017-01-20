@@ -67,22 +67,6 @@ public class FiltroLogEventoNotificacao extends FiltroAbstrato<LogEventoNotifica
 		return cStatAlterado;
 	}
 
-	private String cnpjDest;
-
-	private boolean cnpjDestAlterado;
-
-	public String getCnpjDest() {
-		return cnpjDest;
-	}
-
-	public void setCnpjDest(String cnpjDest) {
-		updateProperty(LogEventoNotificacao_.CNPJDEST, cnpjDest);
-	}
-
-	public boolean isCnpjDestAlterado() {
-		return cnpjDestAlterado;
-	}
-
 	private Date dhRegEvento;
 
 	private boolean dhRegEventoAlterado;
@@ -132,15 +116,14 @@ public class FiltroLogEventoNotificacao extends FiltroAbstrato<LogEventoNotifica
 	}
 
 	public boolean isFiltroAlterado() {
-		return isIdLogEventoAlterado() || isChNFeAlterado() || isCStatAlterado() || isCnpjDestAlterado() || isDhRegEventoAlterado()
-				|| isTpEventoAlterado() || isNProtAlterado();
+		return isIdLogEventoAlterado() || isChNFeAlterado() || isCStatAlterado() || isDhRegEventoAlterado() || isTpEventoAlterado()
+				|| isNProtAlterado();
 	}
 
 	protected void limpar() {
 		setIdLogEvento(null);
 		setChNFe(null);
 		setCStat(null);
-		setCnpjDest(null);
 		setDhRegEvento(null);
 		setTpEvento(null);
 		setNProt(null);
@@ -180,9 +163,6 @@ public class FiltroLogEventoNotificacao extends FiltroAbstrato<LogEventoNotifica
 			case LogEventoNotificacao_.NSEQEVENTO:
 				path = root.get(LogEventoNotificacao_.nSeqEvento);
 				break;
-			case LogEventoNotificacao_.CNPJDEST:
-				path = root.get(LogEventoNotificacao_.cnpjDest);
-				break;
 			case LogEventoNotificacao_.DHREGEVENTO:
 				path = root.get(LogEventoNotificacao_.dhRegEvento);
 				break;
@@ -208,9 +188,6 @@ public class FiltroLogEventoNotificacao extends FiltroAbstrato<LogEventoNotifica
 		}
 		if (isTpEventoAlterado()) {
 			ands.add(criteriaBuilder.equal(root.get(LogEventoNotificacao_.tpEvento), getTpEvento()));
-		}
-		if (isCnpjDestAlterado()) {
-			ands.add(criteriaBuilder.equal(root.get(LogEventoNotificacao_.cnpjDest), getCnpjDest()));
 		}
 		if (isDhRegEventoAlterado()) {
 			ands.add(criteriaBuilder.equal(root.get(LogEventoNotificacao_.dhRegEvento), getDhRegEvento()));

@@ -25,6 +25,7 @@ import javax.enterprise.concurrent.ManagedExecutorService;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.interceptor.Interceptors;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
@@ -66,6 +67,7 @@ import com.dgreentec.domain.model.EventoDocumento;
 import com.dgreentec.domain.model.EventoDocumentoResponse;
 import com.dgreentec.domain.model.LogEventoNotificacao;
 import com.dgreentec.domain.model.LoteEvento;
+import com.dgreentec.domain.model.Tenant;
 import com.dgreentec.domain.model.TipoAmbienteEnum;
 import com.dgreentec.domain.model.TipoDocumentoEnum;
 import com.dgreentec.domain.model.TipoServicoEnum;
@@ -80,7 +82,9 @@ import com.dgreentec.domain.xsd.retEnvEvento_v100.TRetEvento;
 import com.dgreentec.domain.xsd.retEnvEvento_v100.TRetEvento.InfEvento;
 import com.dgreentec.infrastructure.configuration.nfe.WebServices;
 import com.dgreentec.infrastructure.exception.NfeException;
+import com.dgreentec.infrastructure.interceptor.EJBTransactionInterceptor;
 import com.dgreentec.infrastructure.model.ConstantesNFe;
+import com.dgreentec.infrastructure.repository.multitenant.TenantInterceptor;
 import com.dgreentec.infrastructure.ssl.SocketFactoryDinamico;
 import com.dgreentec.infrastructure.util.NFeDateUtils;
 
@@ -94,6 +98,7 @@ import br.inf.portalfiscal.www.nfe.wsdl.recepcaoevento.RecepcaoEventoStub.NfeDad
 import br.inf.portalfiscal.www.nfe.wsdl.recepcaoevento.RecepcaoEventoStub.NfeRecepcaoEventoResult;
 
 @Stateless
+@Interceptors({ TenantInterceptor.class, EJBTransactionInterceptor.class })
 public class NFeServiceBean implements NFeService {
 
 	@Inject
@@ -117,13 +122,13 @@ public class NFeServiceBean implements NFeService {
 
 	@Override
 	@Asynchronous
-	public void processarEventosPorContrato(final Contrato contrato, TipoAmbienteEnum ambiente) throws NfeException {
+	public void processarEventosPorContrato(Tenant tenant, final Contrato contrato, TipoAmbienteEnum ambiente) throws NfeException {
 
 		List<Empresa> empresas = contrato.getEmpresas();
 
 		for (final Empresa empresa : empresas) {
 			try {
-				processarEventosPorEmpresa(contrato, empresa, ambiente);
+				processarEventosPorEmpresa(tenant, contrato, empresa, ambiente);
 			} catch (Throwable e) {
 				throw new NfeException(e);
 			}
@@ -131,9 +136,9 @@ public class NFeServiceBean implements NFeService {
 
 	}
 
-	private Future<EventoDocumentoResponse> scheduleProcess(Long idContrato, String pCNPJ, TipoAmbienteEnum ambiente) {
+	private Future<EventoDocumentoResponse> scheduleProcess(Tenant tenant, String pCNPJ, TipoAmbienteEnum ambiente) {
 		ProcessadorEventoDocumentoEmpresa processador = processadorEventoInstance
-				.select(new ProcessadorEventoDocumentoLiteral(idContrato, pCNPJ, ambiente)).get();
+				.select(new ProcessadorEventoDocumentoLiteral(tenant.getIdTenant(), pCNPJ, ambiente)).get();
 
 		Future<EventoDocumentoResponse> future = executor.submit(processador);
 		return future;
@@ -141,10 +146,11 @@ public class NFeServiceBean implements NFeService {
 
 	@Asynchronous
 	@Override
-	public void processarEventosPorEmpresa(final Contrato contrato, Empresa empresa, TipoAmbienteEnum ambiente) throws NfeException {
+	public void processarEventosPorEmpresa(Tenant tenant, final Contrato contrato, Empresa empresa, TipoAmbienteEnum ambiente)
+			throws NfeException {
 		EventoDocumentoResponse eventosDaEmpresa = null;
 		do {
-			Future<EventoDocumentoResponse> future = scheduleProcess(contrato.getIdContrato(), empresa.getCnpj(), ambiente);
+			Future<EventoDocumentoResponse> future = scheduleProcess(tenant, empresa.getCnpj(), ambiente);
 			try {
 				eventosDaEmpresa = future.get();
 			} catch (InterruptedException | ExecutionException e) {
@@ -169,7 +175,7 @@ public class NFeServiceBean implements NFeService {
 					// guardar a NFe na base/filesystem ...
 					DocumentoFiscal doc = new DocumentoFiscal(TipoDocumentoEnum.NFE, evDoc.getXml(),
 							nfeProc.getNFe().getInfNFe().getIde().getNNF(), empresa);
-					documentoFiscalService.adicionarDocumentoFiscal(contrato, doc);
+					documentoFiscalService.adicionarDocumentoFiscal(tenant, doc);
 					break;
 				}
 				case RESEVENTO: {
@@ -188,7 +194,7 @@ public class NFeServiceBean implements NFeService {
 			// inicia o tratamento com os resumos
 			// TODO os resumos de nfe devem ser manifestados. Manifestar conhecimento da NFe para permitir o download
 			// futuramente.
-			manifestarEventosCienciaDocumentoResumo(contrato, resumos, empresa, ambiente);
+			manifestarEventosCienciaDocumentoResumo(tenant, contrato, resumos, empresa, ambiente);
 
 		} while (eventosDaEmpresa.possuiEventoRestante());
 
@@ -196,7 +202,7 @@ public class NFeServiceBean implements NFeService {
 
 	@Override
 	@Asynchronous
-	public void manifestarEventosCienciaDocumentoResumo(Contrato contrato, List<EventoDocumento> eventos, Empresa empresa,
+	public void manifestarEventosCienciaDocumentoResumo(Tenant tenant, Contrato contrato, List<EventoDocumento> eventos, Empresa empresa,
 			TipoAmbienteEnum ambiente) throws NfeException {
 		// TODO melhorar o tratamento try/catch
 		try {
@@ -204,7 +210,7 @@ public class NFeServiceBean implements NFeService {
 			List<String> lotes = new LinkedList<>();
 
 			// sequencial de lote evento
-			LoteEvento loteEvento = loteEventoService.adicionarLoteEvento(contrato, new LoteEvento(empresa));
+			LoteEvento loteEvento = loteEventoService.adicionarLoteEvento(tenant, new LoteEvento(empresa));
 
 			String idLote = String.valueOf(loteEvento.getIdLoteEvento());
 			String uf = UFEnum.AN.getCodigo();
@@ -241,7 +247,7 @@ public class NFeServiceBean implements NFeService {
 					lotes.add(xml.toString());
 
 					// novo lote
-					loteEvento = loteEventoService.adicionarLoteEvento(contrato, new LoteEvento(empresa));
+					loteEvento = loteEventoService.adicionarLoteEvento(tenant, new LoteEvento(empresa));
 					idLote = String.valueOf(loteEvento.getIdLoteEvento());
 
 					xml = criarCabecalhoEnvEvento(idLote, versao);
@@ -285,7 +291,6 @@ public class NFeServiceBean implements NFeService {
 
 						LogEventoNotificacao log = new LogEventoNotificacao();
 						log.setChNFe(infEvento.getChNFe());
-						log.setCnpjDest(infEvento.getCNPJDest());
 						log.setcOrgao(Integer.valueOf(infEvento.getCOrgao()));
 						log.setcStat(Integer.valueOf(infEvento.getCStat()));
 						log.setDhRegEvento(NFeDateUtils.converterDataCompleta(infEvento.getDhRegEvento()));
@@ -297,7 +302,7 @@ public class NFeServiceBean implements NFeService {
 						log.setxEvento(infEvento.getXEvento());
 						log.setxMotivo(infEvento.getXMotivo());
 
-						logEventoNotificacaoService.adicionarLogEventoNotificacao(contrato, log);
+						logEventoNotificacaoService.adicionarLogEventoNotificacao(tenant, log);
 
 						String cStat = infEvento.getCStat();
 						switch (cStat) {

@@ -11,12 +11,16 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.interceptor.Interceptors;
 import javax.persistence.Id;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.dgreentec.domain.model.Tenant;
+import com.dgreentec.infrastructure.interceptor.EJBTransactionInterceptor;
 import com.dgreentec.infrastructure.model.AbstractEntityVersion;
 import com.dgreentec.infrastructure.model.EntityClassUtils;
+import com.dgreentec.infrastructure.repository.multitenant.TenantInterceptor;
 
 public abstract class AbstractCrudGen {
 
@@ -73,6 +77,8 @@ public abstract class AbstractCrudGen {
 			pw.println("import org.junit.experimental.categories.Category;");
 			pw.println("import org.junit.runner.RunWith;");
 			pw.println("import com.dgreentec.IntegrationTest;");
+			pw.println("import com.dgreentec.AbstractTestCase;");
+			pw.println("import com.dgreentec.AbstractTestCase.DATABASE;");
 			pw.println("//** TESTES **//");
 			pw.println("import static org.junit.Assert.*;");
 			pw.println("import static org.hamcrest.CoreMatchers.*;");
@@ -176,24 +182,24 @@ public abstract class AbstractCrudGen {
 			pw.println("package com.dgreentec.domain.boundary.api;");
 			pw.println("import javax.ejb.Local;");
 			pw.println("import com.dgreentec.infrastructure.persistence.pagination.PagedList;");
-			pw.println("import com.dgreentec.domain.model.Contrato;");
-			pw.println("import " + clazz.getName() + ";");			
+			pw.println("import com.dgreentec.domain.model.Tenant;");
+			pw.println("import " + clazz.getName() + ";");
 			pw.println("import com.dgreentec.domain.repository.filter.Filtro" + clazz.getSimpleName() + ";");
 
 			pw.println("@Local");
 			pw.println("public interface " + serviceName + " {\n");
 
-			pw.println("PagedList<" + clazz.getSimpleName() + "> consultar" + clazz.getSimpleName() + "s(Contrato contrato,Filtro"
+			pw.println("PagedList<" + clazz.getSimpleName() + "> consultar" + clazz.getSimpleName() + "s(Tenant tenant,Filtro"
 					+ clazz.getSimpleName() + " filtro);");
-			pw.println(clazz.getSimpleName() + " adicionar" + clazz.getSimpleName() + "(Contrato contrato," + clazz.getSimpleName() + " p"
+			pw.println(clazz.getSimpleName() + " adicionar" + clazz.getSimpleName() + "(Tenant tenant," + clazz.getSimpleName() + " p"
 					+ clazz.getSimpleName() + ");");
-			pw.println(clazz.getSimpleName() + " atualizar" + clazz.getSimpleName() + "(Contrato contrato," + clazz.getSimpleName() + " p"
+			pw.println(clazz.getSimpleName() + " atualizar" + clazz.getSimpleName() + "(Tenant tenant," + clazz.getSimpleName() + " p"
 					+ clazz.getSimpleName() + ");");
-			pw.println("void remover" + clazz.getSimpleName() + "(Contrato contrato," + clazz.getSimpleName() + " p" + clazz.getSimpleName()
+			pw.println("void remover" + clazz.getSimpleName() + "(Tenant tenant," + clazz.getSimpleName() + " p" + clazz.getSimpleName()
 					+ ");");
 
 			pw.println(clazz.getSimpleName() + " consultar" + clazz.getSimpleName() + "Por" + StringUtils.capitalize(idField.getName())
-					+ "(Contrato contrato," + idField.getType().getSimpleName() + " " + idField.getName() + ");");
+					+ "(Tenant tenant," + idField.getType().getSimpleName() + " " + idField.getName() + ");");
 
 			pw.println("\n}");
 		}
@@ -209,13 +215,17 @@ public abstract class AbstractCrudGen {
 			pw.println("import com.dgreentec.infrastructure.service.boundary.AbstractBoundary;");
 			pw.println("import com.dgreentec.infrastructure.exception.BusinessException;");
 			pw.println("import com.dgreentec.infrastructure.persistence.pagination.PagedList;\n");
-			pw.println("import com.dgreentec.domain.model.Contrato;");
+			pw.println("import com.dgreentec.domain.model.Tenant;");
 			pw.println("import com.dgreentec.domain.boundary.api." + serviceName + ";");
 			pw.println("import " + clazz.getName() + ";");
 			pw.println("import com.dgreentec.domain.repository." + clazz.getSimpleName() + "Repository;");
-			pw.println("import com.dgreentec.domain.repository.filter.Filtro" + clazz.getSimpleName() + ";\n");
+			pw.println("import com.dgreentec.domain.repository.filter.Filtro" + clazz.getSimpleName() + ";");
+			pw.println("import javax.interceptor.Interceptors;");
+			pw.println("import com.dgreentec.infrastructure.interceptor.EJBTransactionInterceptor;");
+			pw.println("import com.dgreentec.infrastructure.repository.multitenant.TenantInterceptor;\n");
 
 			pw.println("@Stateless");
+			pw.println("@Interceptors({ TenantInterceptor.class, EJBTransactionInterceptor.class })");
 			pw.println("public class " + clazz.getSimpleName() + "Boundary extends AbstractBoundary implements " + serviceName + " {\n");
 
 			pw.println("@Inject");
@@ -223,23 +233,25 @@ public abstract class AbstractCrudGen {
 			String repository = StringUtils.uncapitalize(repositoryName);
 			pw.println("private " + repositoryName + " " + repository + ";\n");
 
-			pw.println("public PagedList<" + clazz.getSimpleName() + "> consultar" + clazz.getSimpleName() + "s(Contrato contrato,Filtro"
+			pw.println("public PagedList<" + clazz.getSimpleName() + "> consultar" + clazz.getSimpleName() + "s(Tenant tenant,,Filtro"
 					+ clazz.getSimpleName() + " filtro){");
 			pw.println("return " + repository + ".consultar(filtro);\n}\n");
 
-			pw.println("public " + clazz.getSimpleName() + " adicionar" + clazz.getSimpleName() + "(Contrato contrato," + clazz.getSimpleName() + " p"
-					+ clazz.getSimpleName() + "){");
+			pw.println("public " + clazz.getSimpleName() + " adicionar" + clazz.getSimpleName() + "(Tenant tenant,"
+					+ clazz.getSimpleName() + " p" + clazz.getSimpleName() + "){");
 			pw.println("return " + repository + ".adicionar(p" + clazz.getSimpleName() + ");\n}\n");
 
-			pw.println("public " + clazz.getSimpleName() + " atualizar" + clazz.getSimpleName() + "(Contrato contrato," + clazz.getSimpleName() + " p"
-					+ clazz.getSimpleName() + "){");
+			pw.println("public " + clazz.getSimpleName() + " atualizar" + clazz.getSimpleName() + "(Tenant tenant,"
+					+ clazz.getSimpleName() + " p" + clazz.getSimpleName() + "){");
 			pw.println("return " + repository + ".atualizar(p" + clazz.getSimpleName() + ");\n}\n");
 
-			pw.println("public void remover" + clazz.getSimpleName() + "(Contrato contrato," + clazz.getSimpleName() + " p" + clazz.getSimpleName() + "){");
+			pw.println("public void remover" + clazz.getSimpleName() + "(Tenant tenant," + clazz.getSimpleName() + " p"
+					+ clazz.getSimpleName() + "){");
 			pw.println(repository + ".excluir(p" + clazz.getSimpleName() + ");\n}\n");
 
 			pw.println("public " + clazz.getSimpleName() + " consultar" + clazz.getSimpleName() + "Por"
-					+ StringUtils.capitalize(idField.getName()) + "(Contrato contrato," + idField.getType().getSimpleName() + " " + idField.getName() + "){");
+					+ StringUtils.capitalize(idField.getName()) + "(Tenant tenant," + idField.getType().getSimpleName() + " "
+					+ idField.getName() + "){");
 			pw.println("return " + repository + ".consultarPorChave(" + idField.getName() + ");\n}\n");
 
 			pw.println("}");
@@ -415,7 +427,7 @@ public abstract class AbstractCrudGen {
 			// predicate
 			pw.println("protected Predicate configureWhereClause(CriteriaBuilder criteriaBuilder, Root<" + clazz.getSimpleName()
 					+ "> root, Join... joins) {");
-//			pw.println("Predicate where = criteriaBuilder.conjunction();");
+			//			pw.println("Predicate where = criteriaBuilder.conjunction();");
 			pw.println("List<Predicate> ands = new ArrayList<>();");
 			pw.println("// List<Predicate> ors = new ArrayList<>();");
 			Set<String> setFields = new TreeSet<>(Arrays.asList(filterFields));
@@ -426,7 +438,7 @@ public abstract class AbstractCrudGen {
 				pw.println("/*exemplo:\nEquals\n" + "ands.add(criteriaBuilder.equal(root.get(" + clazz.getSimpleName() + "_." + fd.getName()
 						+ "), get" + StringUtils.capitalize(fd.getName()) + "()));");
 				pw.println("Like\nands.add(criteriaBuilder.like(criteriaBuilder.lower(root.get(" + clazz.getSimpleName() + "_."
-						+ fd.getName() + "), \"%\" + get" + StringUtils.capitalize(fd.getName()) + ".toLowerCase() + \"%\"));\n*/");
+						+ fd.getName() + ")), \"%\" + get" + StringUtils.capitalize(fd.getName()) + "().toLowerCase() + \"%\"));\n*/");
 				pw.println("<< AJUSTAR CONDIÇÃO >>\n}");
 			}
 			pw.println("return criteriaBuilder.and(ands.toArray(new Predicate[ands.size()]));\n}");

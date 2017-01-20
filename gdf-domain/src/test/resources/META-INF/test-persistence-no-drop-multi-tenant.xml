@@ -2,7 +2,7 @@
 <persistence version="2.1"
 	xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
-	<persistence-unit name="projectPu-test">
+	<persistence-unit name="gdf-pu">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<jta-data-source>java:jboss/datasources/testGDFPostgreDS</jta-data-source>
 		<class>com.dgreentec.domain.model.BloqueioSefaz</class>
@@ -11,6 +11,7 @@
 		<class>com.dgreentec.domain.model.DocumentoFiscal</class>
 		<class>com.dgreentec.domain.model.Empresa</class>
 		<class>com.dgreentec.domain.model.EventoNSU</class>
+		<class>com.dgreentec.domain.model.LogEventoNotificacao</class>
 		<class>com.dgreentec.domain.model.LoteEvento</class>
 		<class>com.dgreentec.domain.model.UltimoEventoNSU</class>
 		<class>com.dgreentec.infrastructure.model.AbstractEntityVersion</class>

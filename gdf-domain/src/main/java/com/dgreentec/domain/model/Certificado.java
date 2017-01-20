@@ -1,9 +1,7 @@
 package com.dgreentec.domain.model;
 
 import java.io.ByteArrayInputStream;
-import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -20,17 +18,21 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.PersistenceException;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
-import javax.xml.crypto.dsig.Transform;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
-import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -67,6 +69,20 @@ public class Certificado extends AbstractEntityVersion {
 	@Transient
 	private transient KeyStore ks;
 
+	@Column(name = "DT_VENCIMENTO")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date dataVencimento;
+
+	@PrePersist
+	@PreUpdate
+	public void configure() {
+		try {
+			setDataVencimento(validade());
+		} catch (NfeException e) {
+			throw new PersistenceException(e);
+		}
+	}
+
 	private void loadKeystore() throws Exception {
 		if (ks == null) {
 			ks = KeyStore.getInstance("PKCS12");
@@ -84,10 +100,14 @@ public class Certificado extends AbstractEntityVersion {
 	private void loadCert() throws Exception {
 		if (cert == null) {
 			String aliasKey = alias();
-			KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry) ks.getEntry(aliasKey,
-					new KeyStore.PasswordProtection(senha.toCharArray()));
+			if (StringUtils.isNotEmpty(aliasKey)) {
+				KeyStore.PrivateKeyEntry pkEntry = (KeyStore.PrivateKeyEntry) ks.getEntry(aliasKey,
+						new KeyStore.PasswordProtection(senha.toCharArray()));
 
-			cert = (X509Certificate) pkEntry.getCertificate();
+				cert = (X509Certificate) pkEntry.getCertificate();
+			} else {
+				cert = (X509Certificate) ks.getCertificate("");
+			}
 		}
 	}
 
@@ -127,9 +147,9 @@ public class Certificado extends AbstractEntityVersion {
 
 	public X509Certificate getX509Certificate() throws Exception {
 		loadKeystore();
-		Certificate cert = ks.getCertificate(alias());
-		X509Certificate certificate = (X509Certificate) cert;
-		return certificate;
+		Certificate ksCert = ks.getCertificate(alias());
+		cert = (X509Certificate) ksCert;
+		return cert;
 	}
 
 	public PrivateKey getPrivateKey() throws Exception {
@@ -145,18 +165,6 @@ public class Certificado extends AbstractEntityVersion {
 		X509Data x509Data = keyInfoFactory.newX509Data(x509Content);
 		KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections.singletonList(x509Data));
 		return keyInfo;
-	}
-
-	private ArrayList<Transform> signatureFactory(XMLSignatureFactory signatureFactory)
-			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-		ArrayList<Transform> transformList = new ArrayList<Transform>();
-		TransformParameterSpec tps = null;
-		Transform envelopedTransform = signatureFactory.newTransform(Transform.ENVELOPED, tps);
-		Transform c14NTransform = signatureFactory.newTransform("http://www.w3.org/TR/2001/REC-xml-c14n-20010315", tps);
-
-		transformList.add(envelopedTransform);
-		transformList.add(c14NTransform);
-		return transformList;
 	}
 
 	public Long getIdCertificado() {
@@ -200,6 +208,14 @@ public class Certificado extends AbstractEntityVersion {
 			return this;
 		}
 
+	}
+
+	public Date getDataVencimento() {
+		return dataVencimento;
+	}
+
+	public void setDataVencimento(Date dataVencimento) {
+		this.dataVencimento = dataVencimento;
 	}
 
 }

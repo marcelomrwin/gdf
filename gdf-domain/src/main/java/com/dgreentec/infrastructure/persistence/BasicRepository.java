@@ -7,7 +7,9 @@ import java.util.Map;
 
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Disposes;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
 import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -37,11 +39,13 @@ public abstract class BasicRepository {
 	/**
 	 * EntityManager representa um DAO
 	 */
-	@PersistenceContext
-	protected EntityManager entityManager;
+	//	@PersistenceContext
+	@Inject
+	protected Instance<EntityManager> entityManager;
 
-	@PersistenceContext(synchronization = SynchronizationType.UNSYNCHRONIZED)
-	protected EntityManager unManagedEntityManager;
+	//	@PersistenceContext(synchronization = SynchronizationType.UNSYNCHRONIZED)
+	@Inject
+	protected Instance<EntityManager> unManagedEntityManager;
 
 	@PersistenceUnit
 	protected EntityManagerFactory factory;
@@ -62,137 +66,137 @@ public abstract class BasicRepository {
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
 	public void persist(Object entity) {
-		entityManager.persist(entity);
+		entityManager.get().persist(entity);
 	}
 
 	public void merge(Object entity) {
-		entityManager.merge(entity);
+		entityManager.get().merge(entity);
 		flush();
 	}
 
 	public void remove(Object entity) {
-		entity = entityManager.merge(entity);
-		entityManager.remove(entity);
+		entity = entityManager.get().merge(entity);
+		entityManager.get().remove(entity);
 	}
 
 	public void flush() {
-		entityManager.flush();
+		entityManager.get().flush();
 	}
 
 	public void setFlushMode(FlushModeType flushMode) {
-		entityManager.setFlushMode(flushMode);
+		entityManager.get().setFlushMode(flushMode);
 	}
 
 	public FlushModeType getFlushMode() {
-		return entityManager.getFlushMode();
+		return entityManager.get().getFlushMode();
 	}
 
 	public void clear() {
-		entityManager.clear();
+		entityManager.get().clear();
 	}
 
 	public Map<String, Object> getProperties() {
-		return entityManager.getProperties();
+		return entityManager.get().getProperties();
 	}
 
 	public Query createQuery(String qlString) {
-		return entityManager.createQuery(qlString);
+		return entityManager.get().createQuery(qlString);
 	}
 
 	public Query createQuery(CriteriaUpdate updateQuery) {
-		return entityManager.createQuery(updateQuery);
+		return entityManager.get().createQuery(updateQuery);
 	}
 
 	public Query createQuery(CriteriaDelete deleteQuery) {
-		return entityManager.createQuery(deleteQuery);
+		return entityManager.get().createQuery(deleteQuery);
 	}
 
 	public Query createNamedQuery(String name) {
-		return entityManager.createNamedQuery(name);
+		return entityManager.get().createNamedQuery(name);
 	}
 
 	public Query createNativeQuery(String sqlString) {
-		return entityManager.createNativeQuery(sqlString);
+		return entityManager.get().createNativeQuery(sqlString);
 	}
 
 	public Query createNativeQuery(String sqlString, Class resultClass) {
-		return entityManager.createNativeQuery(sqlString, resultClass);
+		return entityManager.get().createNativeQuery(sqlString, resultClass);
 	}
 
 	public Query createNativeQuery(String sqlString, String resultSetMapping) {
-		return entityManager.createNativeQuery(sqlString, resultSetMapping);
+		return entityManager.get().createNativeQuery(sqlString, resultSetMapping);
 	}
 
 	public StoredProcedureQuery createNamedStoredProcedureQuery(String name) {
-		return entityManager.createNamedStoredProcedureQuery(name);
+		return entityManager.get().createNamedStoredProcedureQuery(name);
 	}
 
 	public StoredProcedureQuery createStoredProcedureQuery(String procedureName) {
-		return entityManager.createStoredProcedureQuery(procedureName);
+		return entityManager.get().createStoredProcedureQuery(procedureName);
 	}
 
 	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, Class... resultClasses) {
-		return entityManager.createStoredProcedureQuery(procedureName, resultClasses);
+		return entityManager.get().createStoredProcedureQuery(procedureName, resultClasses);
 	}
 
 	public StoredProcedureQuery createStoredProcedureQuery(String procedureName, String... resultSetMappings) {
-		return entityManager.createStoredProcedureQuery(procedureName, resultSetMappings);
+		return entityManager.get().createStoredProcedureQuery(procedureName, resultSetMappings);
 	}
 
 	public void joinTransaction() {
-		entityManager.joinTransaction();
+		entityManager.get().joinTransaction();
 	}
 
 	public boolean isJoinedToTransaction() {
-		return entityManager.isJoinedToTransaction();
+		return entityManager.get().isJoinedToTransaction();
 	}
 
 	public <T> T unwrap(Class<T> cls) {
-		return entityManager.unwrap(cls);
+		return entityManager.get().unwrap(cls);
 	}
 
 	public Object getDelegate() {
-		return entityManager.getDelegate();
+		return entityManager.get().getDelegate();
 	}
 
 	public void close() {
-		entityManager.close();
+		entityManager.get().close();
 	}
 
 	public boolean isOpen() {
-		return entityManager.isOpen();
+		return entityManager.get().isOpen();
 	}
 
 	public EntityTransaction getTransaction() {
-		return entityManager.getTransaction();
+		return entityManager.get().getTransaction();
 	}
 
 	public EntityManagerFactory getEntityManagerFactory() {
-		return entityManager.getEntityManagerFactory();
+		return entityManager.get().getEntityManagerFactory();
 	}
 
 	public CriteriaBuilder getCriteriaBuilder() {
-		return entityManager.getCriteriaBuilder();
+		return entityManager.get().getCriteriaBuilder();
 	}
 
 	public Metamodel getMetamodel() {
-		return entityManager.getMetamodel();
+		return entityManager.get().getMetamodel();
 	}
 
 	public <T> EntityGraph<T> createEntityGraph(Class<T> rootType) {
-		return entityManager.createEntityGraph(rootType);
+		return entityManager.get().createEntityGraph(rootType);
 	}
 
 	public EntityGraph<?> createEntityGraph(String graphName) {
-		return entityManager.createEntityGraph(graphName);
+		return entityManager.get().createEntityGraph(graphName);
 	}
 
 	public EntityGraph<?> getEntityGraph(String graphName) {
-		return entityManager.getEntityGraph(graphName);
+		return entityManager.get().getEntityGraph(graphName);
 	}
 
 	public <T> List<EntityGraph<? super T>> getEntityGraphs(Class<T> entityClass) {
-		return entityManager.getEntityGraphs(entityClass);
+		return entityManager.get().getEntityGraphs(entityClass);
 	}
 
 	protected Method findGetterMethod(Object entity, String fieldName) throws Throwable {
@@ -206,23 +210,23 @@ public abstract class BasicRepository {
 	}
 
 	public Object getEntityId(Object entity) {
-		return entityManager.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(entity);
+		return entityManager.get().getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(entity);
 	}
 
 	public EntityManager getEntityManager() {
-		return entityManager;
+		return entityManager.get();
 	}
 
 	public void setEntityManager(EntityManager entityManager) {
-		this.entityManager = entityManager;
+		throw new IllegalArgumentException("CANNOT SET ENTITYMANAGER");
 	}
 
 	public EntityManager getUnManagedEntityManager() {
-		return unManagedEntityManager;
+		return unManagedEntityManager.get();
 	}
 
 	public void setUnManagedEntityManager(EntityManager unManagedEntityManager) {
-		this.unManagedEntityManager = unManagedEntityManager;
+		throw new IllegalArgumentException("CANNOT SET unmanagedENTITYMANAGER");
 	}
 
 	public EntityManagerFactory getFactory() {

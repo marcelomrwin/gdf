@@ -1,20 +1,20 @@
 <arquillian xmlns="http://jboss.org/schema/arquillian" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
-	<container qualifier="jboss" default="true">
+	<container qualifier="wildfly-managed" default="true">
 		<configuration>
 			<property name="jbossHome">${WILDFLY_HOME}</property>
 			<property name="managementAddress">localhost</property>
-			<property name="managementPort">9990</property>
+			<property name="managementPort">10090</property>
 			<property name="allowConnectingToRunningServer">true</property>
 			<property name="startupTimeoutInSeconds">120</property>
 			<property name="serverConfig">standalone-gdf-arquillian.xml</property>
 
-			<property name="javaVmArguments">-Xms128m -Xmx872m -XX:-UseConcMarkSweepGC -Dfile.encoding=UTF-8</property>
-<!-- 			<property name="javaVmArguments">-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=y -Xms128m -Xmx872m -XX:-UseConcMarkSweepGC -Dfile.encoding=UTF-8</property> -->
+<!-- 			<property name="javaVmArguments">-Xms128m -Xmx872m -XX:-UseConcMarkSweepGC -Dfile.encoding=UTF-8 -Djboss.socket.binding.port-offset=100</property> -->
+			<property name="javaVmArguments">-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=y -Xms128m -Xmx872m -XX:-UseConcMarkSweepGC -Dfile.encoding=UTF-8 -Djboss.socket.binding.port-offset=100</property>
 
 <!-- 			<property name="javaVmArguments">-Xbootclasspath/a:${WILDFLY_HOME}/modules/org/codehaus/woodstox/main/woodstox-core-asl-4.2.0.jar -Xbootclasspath/a:${WILDFLY_HOME}/modules/org/codehaus/woodstox/main/stax2-api-4.0.0.jar -Xms128m -Xmx872m -XX:-UseConcMarkSweepGC -Dfile.encoding=UTF-8 -Djavax.xml.stream.XMLInputFactory=com.ctc.wstx.stax.WstxInputFactory -Djavax.xml.stream.XMLOutputFactory=com.ctc.wstx.stax.WstxOutputFactory -Djavax.xml.stream.XMLEventFactory=com.ctc.wstx.stax.WstxEventFactory</property> -->
-<!-- 			<property name="javaVmArguments">-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=y -Xms128m -Xmx872m -XX:-UseConcMarkSweepGC -Dfile.encoding=UTF-8 -Djavax.xml.stream.XMLInputFactory=com.ctc.wstx.stax.WstxInputFactory -Djavax.xml.stream.XMLOutputFactory=com.ctc.wstx.stax.WstxOutputFactory -Djavax.xml.stream.XMLEventFactory=com.ctc.wstx.stax.WstxEventFactory</property> -->
 		</configuration>
 	</container>
+
 </arquillian>
 
 

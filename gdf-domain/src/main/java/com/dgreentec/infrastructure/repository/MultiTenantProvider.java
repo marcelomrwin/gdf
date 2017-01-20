@@ -47,7 +47,7 @@ public class MultiTenantProvider implements MultiTenantConnectionProvider, Servi
 	public Connection getConnection(String tenantIdentifier) throws SQLException {
 		Connection connection = getAnyConnection();
 		try {
-			logger.debug("Change to schema " + tenantIdentifier);
+			logger.debug("Change to schema " + tenantIdentifier);System.out.println("****************\n"+"Change to schema " + tenantIdentifier+"\n***********************");
 			try (Statement stm = connection.createStatement()) {
 				stm.execute("SET SCHEMA '" + tenantIdentifier + "'");
 			}

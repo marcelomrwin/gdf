@@ -11,6 +11,10 @@ import com.dgreentec.domain.model.LogEventoNotificacao;
 import com.dgreentec.domain.model.LogEventoNotificacao_;
 import com.dgreentec.domain.model.LoteEvento;
 import com.dgreentec.domain.model.LoteEvento_;
+import com.dgreentec.domain.model.Tenant;
+import com.dgreentec.domain.model.Tenant_;
+import com.dgreentec.domain.model.Usuario;
+import com.dgreentec.domain.model.Usuario_;
 import com.dgreentec.infrastructure.crud.AbstractCrudGen;
 import com.dgreentec.infrastructure.model.AbstractEntityVersion;
 
@@ -21,13 +25,11 @@ public class CrudGen extends AbstractCrudGen {
 
 		System.out.println(new Date() + " - begin");
 		// Classe do modelo que será usada para gerar artefatos
-		Class<? extends AbstractEntityVersion> clazz = LogEventoNotificacao.class;
+		Class<? extends AbstractEntityVersion> clazz = Usuario.class;
 		try {
 			prepare();
 			// gera as classes e filtro para os campos abaixo
-			generate(clazz, LogEventoNotificacao_.IDLOGEVENTO, LogEventoNotificacao_.CHNFE, LogEventoNotificacao_.CSTAT,
-					LogEventoNotificacao_.CNPJDEST, LogEventoNotificacao_.DHREGEVENTO, LogEventoNotificacao_.TPEVENTO,
-					LogEventoNotificacao_.NPROT);
+			generate(clazz, Usuario_.CPF, Usuario_.NOME);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

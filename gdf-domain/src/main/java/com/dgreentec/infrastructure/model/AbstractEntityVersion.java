@@ -12,15 +12,15 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
 import javax.persistence.Version;
 import javax.xml.bind.JAXBContext;
@@ -58,17 +58,26 @@ public abstract class AbstractEntityVersion implements DomainObject, Cloneable, 
 	@Column(name = "NUM_VERSAO", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
 	protected Integer version;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(columnDefinition = "timestamp without time zone default current_timestamp", name = "DAT_CRIACAO")
-	protected Date dataCriacao;
+	@Column(columnDefinition = "timestamp without time zone", name = "DAT_CRIACAO", updatable = false, nullable = false)
+	protected LocalDateTime dataCriacao;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@Column(columnDefinition = "timestamp without time zone default current_timestamp", name = "DAT_ULTIMA_ALTERACAO")
-	protected Date dataUltimaAlteracao;
+	@Column(columnDefinition = "timestamp without time zone", name = "DAT_ULTIMA_ALTERACAO", nullable = false)
+	protected LocalDateTime dataUltimaAlteracao;
 
 	@Transient
 	@XmlTransient
 	protected String uid;
+
+	@PrePersist
+	public void prePersist() {
+		setDataCriacao(LocalDateTime.now());
+		setDataUltimaAlteracao(LocalDateTime.now());
+	}
+
+	@PreUpdate
+	public void preUpdate() {
+		setDataUltimaAlteracao(LocalDateTime.now());
+	}
 
 	public AbstractEntityVersion clone() {
 		try {
@@ -85,11 +94,11 @@ public abstract class AbstractEntityVersion implements DomainObject, Cloneable, 
 		}
 	}
 
-	public Date getDataCriacao() {
+	public LocalDateTime getDataCriacao() {
 		return dataCriacao;
 	}
 
-	public Date getDataUltimaAlteracao() {
+	public LocalDateTime getDataUltimaAlteracao() {
 		return dataUltimaAlteracao;
 	}
 
@@ -97,11 +106,11 @@ public abstract class AbstractEntityVersion implements DomainObject, Cloneable, 
 		return StringUtils.isNotEmpty(texto);
 	}
 
-	public void setDataUltimaAlteracao(Date dataUltimaAlteracao) {
+	public void setDataUltimaAlteracao(LocalDateTime dataUltimaAlteracao) {
 		this.dataUltimaAlteracao = dataUltimaAlteracao;
 	}
 
-	public void setDataCriacao(Date dataCriacao) {
+	public void setDataCriacao(LocalDateTime dataCriacao) {
 		this.dataCriacao = dataCriacao;
 	}
 

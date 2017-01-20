@@ -14,11 +14,15 @@ public abstract class EventoNSU_ extends com.dgreentec.infrastructure.model.Abst
 	public static volatile SingularAttribute<EventoNSU, String> observacao;
 	public static volatile SingularAttribute<EventoNSU, Long> idNsu;
 	public static volatile SingularAttribute<EventoNSU, Date> dtNSU;
+	public static volatile SingularAttribute<EventoNSU, Long> idEventoNsu;
+	public static volatile SingularAttribute<EventoNSU, String> codCNPJ;
 
 	public static final String SCHEMA = "schema";
 	public static final String OBSERVACAO = "observacao";
 	public static final String IDNSU = "idNsu";
 	public static final String DTNSU = "dtNSU";
+	public static final String IDEVENTONSU = "idEventoNsu";
+	public static final String CODCNPJ = "codCNPJ";
 
 }
 

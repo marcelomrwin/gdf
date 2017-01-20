@@ -571,6 +571,8 @@
 							</compilerArguments>
 							<generatedSourcesDirectory>src/main/java/</generatedSourcesDirectory>
 							<failOnError>true</failOnError>
+							<debug>true</debug>
+							<verbose>true</verbose>							
 						</configuration>
 					</plugin>
 					<plugin>
@@ -606,4 +608,8 @@
 
 	</profiles>
 
+	<organization>
+		<name>Dgreen</name>
+		<url>http://dgreentec.com.br/</url>
+	</organization>
 </project>

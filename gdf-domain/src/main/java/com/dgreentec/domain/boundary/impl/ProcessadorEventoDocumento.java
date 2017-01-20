@@ -22,7 +22,7 @@ import com.dgreentec.domain.model.TipoAmbienteEnum;
 public @interface ProcessadorEventoDocumento {
 
 	@Nonbinding
-	long idContrato() default 0;
+	long idTenant() default 0;
 
 	@Nonbinding
 	String cnpj() default "";

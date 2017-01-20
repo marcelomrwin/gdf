@@ -30,7 +30,7 @@ public class EmpresaRepositoryJPABean extends GenericModelRepository<Empresa> im
 		Root<Empresa> root = cq.from(Empresa.class);
 		cq.select(root.get(Empresa_.ultimoNSU));
 		cq.where(cb.equal(root.get(Empresa_.cnpj), cnpj));
-		TypedQuery<UltimoEventoNSU> tq = entityManager.createQuery(cq);
+		TypedQuery<UltimoEventoNSU> tq = entityManager.get().createQuery(cq);
 		UltimoEventoNSU ultimoNSU = new UltimoEventoNSU();
 		try {
 			ultimoNSU = tq.getSingleResult();

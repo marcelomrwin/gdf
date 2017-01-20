@@ -1,22 +1,23 @@
 package com.dgreentec.domain.boundary.api;
 
 import javax.ejb.Local;
-import com.dgreentec.infrastructure.persistence.pagination.PagedList;
-import com.dgreentec.domain.model.Contrato;
+
 import com.dgreentec.domain.model.LogEventoNotificacao;
+import com.dgreentec.domain.model.Tenant;
 import com.dgreentec.domain.repository.filter.FiltroLogEventoNotificacao;
+import com.dgreentec.infrastructure.persistence.pagination.PagedList;
 
 @Local
 public interface LogEventoNotificacaoService {
 
-	PagedList<LogEventoNotificacao> consultarLogEventoNotificacaos(Contrato contrato, FiltroLogEventoNotificacao filtro);
+	PagedList<LogEventoNotificacao> consultarLogEventoNotificacaos(Tenant tenant, FiltroLogEventoNotificacao filtro);
 
-	LogEventoNotificacao adicionarLogEventoNotificacao(Contrato contrato, LogEventoNotificacao pLogEventoNotificacao);
+	LogEventoNotificacao adicionarLogEventoNotificacao(Tenant tenant, LogEventoNotificacao pLogEventoNotificacao);
 
-	LogEventoNotificacao atualizarLogEventoNotificacao(Contrato contrato, LogEventoNotificacao pLogEventoNotificacao);
+	LogEventoNotificacao atualizarLogEventoNotificacao(Tenant tenant, LogEventoNotificacao pLogEventoNotificacao);
 
-	void removerLogEventoNotificacao(Contrato contrato, LogEventoNotificacao pLogEventoNotificacao);
+	void removerLogEventoNotificacao(Tenant tenant, LogEventoNotificacao pLogEventoNotificacao);
 
-	LogEventoNotificacao consultarLogEventoNotificacaoPorIdLogEvento(Contrato contrato, Long idLogEvento);
+	LogEventoNotificacao consultarLogEventoNotificacaoPorIdLogEvento(Tenant tenant, Long idLogEvento);
 
 }

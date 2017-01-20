@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1"
+	xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="gdf-pu">
+		<provider>org.hibernate.ejb.HibernatePersistence</provider>
+		<jta-data-source>java:jboss/datasources/testGDFPostgreDS</jta-data-source>
+		<class>com.dgreentec.domain.model.BloqueioSefaz</class>
+		<class>com.dgreentec.domain.model.Certificado</class>
+		<class>com.dgreentec.domain.model.Contrato</class>
+		<class>com.dgreentec.domain.model.DocumentoFiscal</class>
+		<class>com.dgreentec.domain.model.Empresa</class>
+		<class>com.dgreentec.domain.model.EventoNSU</class>
+		<class>com.dgreentec.domain.model.LogEventoNotificacao</class>
+		<class>com.dgreentec.domain.model.LoteEvento</class>
+		<class>com.dgreentec.domain.model.Tenant</class>
+		<class>com.dgreentec.domain.model.UltimoEventoNSU</class>
+		<class>com.dgreentec.domain.model.Usuario</class>
+		<class>com.dgreentec.infrastructure.model.AbstractEntityVersion</class>
+		<exclude-unlisted-classes>false</exclude-unlisted-classes>
+		<shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
+		<properties>
+			<property name="javax.persistence.schema-generation.database.action" value="drop-and-create" />
+			<property name="javax.persistence.schema-generation.scripts.action"	value="drop-and-create" />
+			<property name="javax.persistence.schema-generation.scripts.create-target" value="src/main/resources/sql/projectCreate.ddl" />
+			<property name="javax.persistence.schema-generation.scripts.drop-target" value="src/main/resources/sql/projectDrop.ddl" />
+
+			<!-- Properties for Hibernate -->
+			<property name="hibernate.generate_statistics" value="true" />
+			<property name="hibernate.id.new_generator_mappings" value="true" />
+
+		</properties>
+	</persistence-unit>
+</persistence>

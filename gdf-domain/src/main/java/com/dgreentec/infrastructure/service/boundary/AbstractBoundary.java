@@ -31,12 +31,13 @@ public abstract class AbstractBoundary {
 	@Inject
 	protected Validator validator;
 
-	@PersistenceContext
-	protected EntityManager em;
+//	@PersistenceContext
 
-	protected void flushCurrentEntityManager() {
-		em.flush();
-	}
+//	protected EntityManager em;
+
+//	protected void flushCurrentEntityManager() {
+//		em.flush();
+//	}
 
 	protected UserTransaction lookupUserTransaction() {
 		UserTransaction ut = null;

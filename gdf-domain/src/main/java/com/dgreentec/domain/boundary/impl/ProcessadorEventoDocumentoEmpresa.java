@@ -26,12 +26,13 @@ import org.slf4j.Logger;
 
 import com.dgreentec.domain.boundary.api.ContratoService;
 import com.dgreentec.domain.boundary.api.EmpresaService;
-import com.dgreentec.domain.boundary.api.NFeService;
+import com.dgreentec.domain.boundary.api.TenantService;
 import com.dgreentec.domain.model.BloqueioSefaz;
 import com.dgreentec.domain.model.Empresa;
 import com.dgreentec.domain.model.EventoDocumento;
 import com.dgreentec.domain.model.EventoDocumentoResponse;
 import com.dgreentec.domain.model.EventoNSU;
+import com.dgreentec.domain.model.Tenant;
 import com.dgreentec.domain.model.TipoAmbienteEnum;
 import com.dgreentec.domain.model.TipoServicoEnum;
 import com.dgreentec.domain.model.UFEnum;
@@ -85,19 +86,22 @@ public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumen
 		}
 
 		if (evento != null) {
-			long idContrato = evento.idContrato();
+			long idTenant = evento.idTenant();
 			String cnpj = evento.cnpj();
 			ambiente = evento.ambiente();
-
+			TenantService tenantService = CDIUtils.getInstance().getBeanInstance(TenantService.class);
+			tenant = tenantService.consultarTenantPorIdTenant(idTenant);
 			ContratoService contratoService = CDIUtils.getInstance().getBeanInstance(ContratoService.class);
 			EmpresaService empresaService = CDIUtils.getInstance().getBeanInstance(EmpresaService.class);
 
-			empresa = empresaService.consultarEmpresaPorCnpj(contratoService.consultarContratoPorIdContrato(idContrato), cnpj);
+			empresa = empresaService.consultarEmpresaPorCnpj(tenant, cnpj);
 		} else
 			throw new IllegalStateException("No @ProcessadorEventoDocumento on InjectionPoint");
 	}
 
 	private Empresa empresa;
+
+	private Tenant tenant;
 
 	private TipoAmbienteEnum ambiente;
 
@@ -141,7 +145,7 @@ public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumen
 			response.setUltimoNSu(retorno.getUltNSU());
 
 			if (retorno.getCStat().equalsIgnoreCase(ConstantesNFe.RETORNO_EVENTO_MANIFESTO_138)) {
-				empresa = empresaService.consultarEmpresaPorCnpj(empresa.getContrato(), empresa.getCnpj());
+				empresa = empresaService.consultarEmpresaPorCnpj(tenant, empresa.getCnpj());
 				LoteDistDFeInt loteDistDFeInt = retorno.getLoteDistDFeInt();
 				UltimoEventoNSU ultimo = new UltimoEventoNSU();
 				ultimo.setDataUltimoNSU(NFeDateUtils.converterData(retorno.getDhResp()));
@@ -197,6 +201,7 @@ public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumen
 					eventoNSU.setIdNsu(evDoc.getNsu());
 					eventoNSU.setDtNSU(new Date());
 					eventoNSU.setSchema(evDoc.getSchema());
+					eventoNSU.setCodCNPJ(empresa.getCnpj());
 					empresa.adicionarNSU(eventoNSU);
 
 					lista.add(evDoc);
@@ -206,7 +211,7 @@ public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumen
 				logger.warn("não houve documentos para recuperar [" + retorno.getCStat() + ":" + retorno.getXMotivo() + "] para a empresa "
 						+ empresa.getCnpj() + " - " + empresa.getNome());
 
-				empresa = empresaService.consultarEmpresaPorCnpj(empresa.getContrato(), empresa.getCnpj());
+				//				empresa = empresaService.consultarEmpresaPorCnpj(empresa.getContrato(), empresa.getCnpj());
 
 				// após um código 137 a SEFAZ recomenda aguardar em torno de 1 hora antes de realizar a nova chamada, do
 				// contrário corre-se o risco de cair numa "lista negra".
@@ -219,17 +224,17 @@ public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumen
 				bloqueio.setDtExpiracao(c.getTime());
 				empresa.setBloqueioSefaz(bloqueio);
 
-				empresaService.atualizarEmpresa(empresa.getContrato(), empresa);
+				//				empresaService.atualizarEmpresa(empresa.getContrato(), empresa);
 
 			} else {
+				//TODO o que fazer???
 				logger.error("RETORNO DESCONHECIDO [" + retorno.getCStat() + ":" + retorno.getXMotivo() + "] Não processou a empresa "
 						+ empresa.getCnpj() + " - " + empresa.getNome());
 
 			}
 
 			// FIXME - processa os ventos aqui? envia por evento cdi? faz chamadas recursivas até receber todos os NSUs?
-			empresa = empresaService.atualizarEmpresa(empresa.getContrato(), empresa);
-			// nfeService.processarEventoDocumentoParaEmpresa(empresa.getContrato(), empresa, evDoc);
+			empresa = empresaService.atualizarEmpresa(tenant, empresa);
 		}
 		return response;
 	}

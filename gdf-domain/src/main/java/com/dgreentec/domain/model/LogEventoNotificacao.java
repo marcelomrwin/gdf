@@ -54,9 +54,6 @@ public class LogEventoNotificacao extends AbstractEntityVersion {
 	@Column(name = "NUM_SEQ_EVENTO")
 	protected Integer nSeqEvento;
 
-	@Column(name = "COD_CNPJ_DEST", length = 14)
-	protected String cnpjDest;
-
 	@Column(name = "DT_REGISTRO")
 	@Temporal(TemporalType.TIMESTAMP)
 	protected Date dhRegEvento;
@@ -144,14 +141,6 @@ public class LogEventoNotificacao extends AbstractEntityVersion {
 		this.nSeqEvento = nSeqEvento;
 	}
 
-	public String getCnpjDest() {
-		return cnpjDest;
-	}
-
-	public void setCnpjDest(String cnpjDest) {
-		this.cnpjDest = cnpjDest;
-	}
-
 	public Date getDhRegEvento() {
 		return dhRegEvento;
 	}
@@ -187,11 +176,6 @@ public class LogEventoNotificacao extends AbstractEntityVersion {
 
 		public Builder comCOrgao(Integer pCOrgao) {
 			this.entity.setcOrgao(pCOrgao);
-			return this;
-		}
-
-		public Builder comCnpjDest(String pCnpjDest) {
-			this.entity.setCnpjDest(pCnpjDest);
 			return this;
 		}
 

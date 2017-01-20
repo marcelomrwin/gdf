@@ -2,6 +2,7 @@ package com.dgreentec.infrastructure.interceptor;
 
 import javax.annotation.Resource;
 import javax.ejb.SessionContext;
+import javax.inject.Inject;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.InvocationContext;
 import javax.persistence.EntityManager;
@@ -23,7 +24,8 @@ public class EJBTransactionInterceptor {
 	@Resource
 	TransactionSynchronizationRegistry tsr;
 
-	@PersistenceContext
+//	@PersistenceContext
+	@Inject
 	protected EntityManager entityManager;
 
 	@Resource

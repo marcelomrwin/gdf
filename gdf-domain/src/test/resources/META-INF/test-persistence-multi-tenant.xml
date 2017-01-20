@@ -2,7 +2,7 @@
 <persistence version="2.1"
 	xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
-	<persistence-unit name="projectPu-test">
+	<persistence-unit name="gdf-pu">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<jta-data-source>java:jboss/datasources/testGDFPostgreDS</jta-data-source>
 		<class>com.dgreentec.domain.model.BloqueioSefaz</class>
@@ -11,27 +11,23 @@
 		<class>com.dgreentec.domain.model.DocumentoFiscal</class>
 		<class>com.dgreentec.domain.model.Empresa</class>
 		<class>com.dgreentec.domain.model.EventoNSU</class>
+		<class>com.dgreentec.domain.model.LogEventoNotificacao</class>
 		<class>com.dgreentec.domain.model.LoteEvento</class>
 		<class>com.dgreentec.domain.model.UltimoEventoNSU</class>
 		<class>com.dgreentec.infrastructure.model.AbstractEntityVersion</class>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 		<shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
 		<properties>
-			<property name="javax.persistence.schema-generation.database.action"
-				value="drop-and-create" />
-			<property name="javax.persistence.schema-generation.scripts.action"
-				value="drop-and-create" />
-			<property name="javax.persistence.schema-generation.scripts.create-target"
-				value="src/main/resources/sql/projectCreate.ddl" />
-			<property name="javax.persistence.schema-generation.scripts.drop-target"
-				value="src/main/resources/sql/projectDrop.ddl" />
-			<property name="javax.persistence.sql-load-script-source"
-				value="src/main/resources/sql/prepare.sql" />
+			<property name="javax.persistence.schema-generation.database.action" value="drop-and-create" />
+			<property name="javax.persistence.schema-generation.scripts.action"	value="drop-and-create" />
+			<property name="javax.persistence.schema-generation.scripts.create-target" value="src/main/resources/sql/projectCreate.ddl" />
+			<property name="javax.persistence.schema-generation.scripts.drop-target" value="src/main/resources/sql/projectDrop.ddl" />
+			<property name="javax.persistence.sql-load-script-source" value="src/main/resources/sql/prepare.sql" />
 
 			<!-- Hibernate Multi Tenancy -->
-			<property name="hibernate.multiTenancy" value="SCHEMA" />
-			<property name="hibernate.multi_tenant_connection_provider"	value="com.dgreentec.infrastructure.repository.MultiTenantProvider" />
-			<property name="hibernate.tenant_identifier_resolver" value="com.dgreentec.infrastructure.repository.SchemaResolver" />
+<!-- 			<property name="hibernate.multiTenancy" value="SCHEMA" /> -->
+<!-- 			<property name="hibernate.multi_tenant_connection_provider"	value="com.dgreentec.infrastructure.repository.MultiTenantProvider" /> -->
+<!-- 			<property name="hibernate.tenant_identifier_resolver" value="com.dgreentec.infrastructure.repository.SchemaResolver" /> -->
 
 			<!-- Properties for Hibernate -->
 			<property name="hibernate.generate_statistics" value="true" />

@@ -36,28 +36,28 @@ public class GenericRepository extends BasicRepository implements RepositoryJPA 
 	private static final long serialVersionUID = -125960157421221504L;
 
 	protected CriteriaBuilder createCriteriaBuilder() {
-		return entityManager.getCriteriaBuilder();
+		return entityManager.get().getCriteriaBuilder();
 	}
 
 	protected <E extends AbstractEntityVersion> E create(E entity) {
-		entityManager.persist(entity);
+		entityManager.get().persist(entity);
 		return entity;
 	}
 
 	protected <E extends AbstractEntityVersion> E update(E entity) {
-		E newEntity = entityManager.merge(entity);
+		E newEntity = entityManager.get().merge(entity);
 		return newEntity;
 	}
 
 	protected <E extends AbstractEntityVersion> void delete(E entity) {
-		entityManager.remove(entityManager.merge(entity));
+		entityManager.get().remove(entityManager.get().merge(entity));
 	}
 
 	public <E extends AbstractEntityVersion> boolean exists(Class<E> cl, Serializable id) {
 		E find = readById(cl, id);
 		boolean exists = find != null;
 		if (exists)
-			entityManager.detach(find);
+			entityManager.get().detach(find);
 		return exists;
 	}
 
@@ -82,14 +82,14 @@ public class GenericRepository extends BasicRepository implements RepositoryJPA 
 	public <E extends AbstractEntityVersion> E readById(Class<E> cl, Serializable id) {
 		if (id == null)
 			return null;
-		E entity = entityManager.find(cl, id);
+		E entity = entityManager.get().find(cl, id);
 		return entity;
 	}
 
 	public <E extends AbstractEntityVersion> E loadById(Class<E> cl, Serializable id) {
 		if (id == null)
 			return null;
-		Session session = entityManager.unwrap(Session.class);
+		Session session = entityManager.get().unwrap(Session.class);
 		E entity = session.load(cl, id);
 		return entity;
 	}
@@ -117,7 +117,7 @@ public class GenericRepository extends BasicRepository implements RepositoryJPA 
 	@SuppressWarnings("unchecked")
 	protected <E extends AbstractEntityVersion> TypedQuery<E> createTypedQuery(CriteriaQuery<E> criteriaQuery, FiltroAbstrato<E> filtro,
 			boolean useCache, EntityGraph<E>... graphs) {
-		TypedQuery<E> tq = entityManager.createQuery(criteriaQuery);
+		TypedQuery<E> tq = entityManager.get().createQuery(criteriaQuery);
 		if (!filtro.isRetornarTodosOsRegistros()) {
 			if (filtro.getPageSize() >= 0) {
 				tq.setMaxResults(filtro.getPageSize());
@@ -143,7 +143,7 @@ public class GenericRepository extends BasicRepository implements RepositoryJPA 
 
 	protected <E extends AbstractEntityVersion> TypedQuery<Object[]> createObjectArrayQuery(CriteriaQuery<Object[]> criteriaQuery,
 			FiltroAbstrato<E> filtro, boolean useCache) {
-		TypedQuery<Object[]> tq = entityManager.createQuery(criteriaQuery);
+		TypedQuery<Object[]> tq = entityManager.get().createQuery(criteriaQuery);
 		if (!filtro.isRetornarTodosOsRegistros()) {
 			if (filtro.getPageSize() >= 0) {
 				tq.setMaxResults(filtro.getPageSize());
@@ -162,7 +162,7 @@ public class GenericRepository extends BasicRepository implements RepositoryJPA 
 	}
 
 	protected TypedQuery<Tuple> createTypedQueryForObjectArray(CriteriaQuery criteriaQuery, FiltroAbstrato filtro, boolean useCache) {
-		TypedQuery<Tuple> tq = entityManager.createQuery(criteriaQuery);
+		TypedQuery<Tuple> tq = entityManager.get().createQuery(criteriaQuery);
 		if (!filtro.isRetornarTodosOsRegistros()) {
 			if (filtro.getPageSize() >= 0) {
 				tq.setMaxResults(filtro.getPageSize());
@@ -181,94 +181,94 @@ public class GenericRepository extends BasicRepository implements RepositoryJPA 
 	}
 
 	protected Long processCountQuery(CriteriaQuery<Long> qc) {
-		return entityManager.createQuery(qc).getSingleResult();
+		return entityManager.get().createQuery(qc).getSingleResult();
 	}
 
 	public <T extends AbstractEntityVersion> T merge(T entity) {
-		return entityManager.merge(entity);
+		return entityManager.get().merge(entity);
 	}
 
 	public <T extends AbstractEntityVersion> T find(Class<T> entityClass, Object primaryKey) {
-		return entityManager.find(entityClass, primaryKey);
+		return entityManager.get().find(entityClass, primaryKey);
 	}
 
 	public <T extends AbstractEntityVersion> T find(Class<T> entityClass, Object primaryKey, Map<String, Object> properties) {
-		return entityManager.find(entityClass, primaryKey, properties);
+		return entityManager.get().find(entityClass, primaryKey, properties);
 	}
 
 	public <T extends AbstractEntityVersion> T find(Class<T> entityClass, Object primaryKey, LockModeType lockMode) {
-		return entityManager.find(entityClass, primaryKey, lockMode);
+		return entityManager.get().find(entityClass, primaryKey, lockMode);
 	}
 
 	public <T extends AbstractEntityVersion> T find(Class<T> entityClass, Object primaryKey, LockModeType lockMode,
 			Map<String, Object> properties) {
-		return entityManager.find(entityClass, primaryKey, lockMode, properties);
+		return entityManager.get().find(entityClass, primaryKey, lockMode, properties);
 	}
 
 	public <T extends AbstractEntityVersion> T getReference(Class<T> entityClass, Object primaryKey) {
-		return entityManager.getReference(entityClass, primaryKey);
+		return entityManager.get().getReference(entityClass, primaryKey);
 	}
 
 	public <T extends AbstractEntityVersion> void lock(T entity, LockModeType lockMode) {
-		entityManager.lock(entity, lockMode);
+		entityManager.get().lock(entity, lockMode);
 	}
 
 	public <T extends AbstractEntityVersion> void lock(T entity, LockModeType lockMode, Map<String, Object> properties) {
-		entityManager.lock(entity, lockMode, properties);
+		entityManager.get().lock(entity, lockMode, properties);
 	}
 
 	public <T extends AbstractEntityVersion> void refresh(T entity) {
-		entityManager.refresh(entity);
+		entityManager.get().refresh(entity);
 	}
 
 	public <T extends AbstractEntityVersion> void refresh(T entity, Map<String, Object> properties) {
-		entityManager.refresh(entity, properties);
+		entityManager.get().refresh(entity, properties);
 	}
 
 	public <T extends AbstractEntityVersion> void refresh(T entity, LockModeType lockMode) {
-		entityManager.refresh(entity, lockMode);
+		entityManager.get().refresh(entity, lockMode);
 	}
 
 	public <T extends AbstractEntityVersion> void refresh(T entity, LockModeType lockMode, Map<String, Object> properties) {
-		entityManager.refresh(entity, lockMode, properties);
+		entityManager.get().refresh(entity, lockMode, properties);
 	}
 
 	public <T extends AbstractEntityVersion> void detach(T entity) {
-		entityManager.detach(entity);
+		entityManager.get().detach(entity);
 	}
 
 	public <T extends AbstractEntityVersion> boolean contains(T entity) {
-		return entityManager.contains(entity);
+		return entityManager.get().contains(entity);
 	}
 
 	public <T extends AbstractEntityVersion> LockModeType getLockMode(T entity) {
-		return entityManager.getLockMode(entity);
+		return entityManager.get().getLockMode(entity);
 	}
 
 	public void setProperty(String propertyName, Object value) {
-		entityManager.setProperty(propertyName, value);
+		entityManager.get().setProperty(propertyName, value);
 	}
 
 	public <T extends AbstractEntityVersion> TypedQuery<T> createQuery(CriteriaQuery<T> criteriaQuery) {
-		return entityManager.createQuery(criteriaQuery);
+		return entityManager.get().createQuery(criteriaQuery);
 	}
 
 	public <T extends AbstractEntityVersion> TypedQuery<T> createQuery(String qlString, Class<T> resultClass) {
-		return entityManager.createQuery(qlString, resultClass);
+		return entityManager.get().createQuery(qlString, resultClass);
 	}
 
 	public <T extends AbstractEntityVersion> TypedQuery<T> createNamedQuery(String name, Class<T> resultClass) {
-		return entityManager.createNamedQuery(name, resultClass);
+		return entityManager.get().createNamedQuery(name, resultClass);
 	}
 
 	protected <E extends DomainObject> Long contar(Class<E> clazz, SingularAttribute<E, Long> attr, FiltroAbstrato<E> filtro,
 			SetJoin... joins) {
-		CriteriaBuilder cb = unManagedEntityManager.getCriteriaBuilder();
+		CriteriaBuilder cb = unManagedEntityManager.get().getCriteriaBuilder();
 		CriteriaQuery<Long> cq = cb.createQuery(Long.class);
 		Root<E> root = cq.from(clazz);
 		cq.select(cb.countDistinct(root.get(attr)));
 		filtro.configurarBusca(cb, cq, root, joins);
-		TypedQuery<Long> tq = unManagedEntityManager.createQuery(cq);
+		TypedQuery<Long> tq = unManagedEntityManager.get().createQuery(cq);
 		return tq.getSingleResult();
 	}
 
@@ -276,7 +276,7 @@ public class GenericRepository extends BasicRepository implements RepositoryJPA 
 			SingularAttribute<E, Long> attr, FiltroAbstrato<E> filtro, SetJoin... joins) {
 		cq.select(cb.countDistinct(root.get(attr)));
 		filtro.configurarBusca(cb, cq, root, joins);
-		TypedQuery<Long> tq = unManagedEntityManager.createQuery(cq);
+		TypedQuery<Long> tq = unManagedEntityManager.get().createQuery(cq);
 		return tq.getSingleResult();
 	}
 

@@ -45,7 +45,7 @@ public class ProcessadorEventoNotificacao implements Callable<String> {
 		//debug
 		System.out.println(lote);
 		//end debug
-		
+
 		OMElement ome = AXIOMUtil.stringToOM(lote);
 		NfeDadosMsg dados = new NfeDadosMsg();
 		dados.setExtraElement(ome);

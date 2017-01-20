@@ -68,6 +68,7 @@ public class NFeServiceEventoIT extends AbstractTestCase {
 
 		nfeService.processarEventosPorContrato(contrato, ambiente);
 
-		TimeUnit.SECONDS.sleep(30);
+//como o serviço é todo assincrono é preciso forçar um sleep
+		TimeUnit.MINUTES.sleep(5);
 	}
 }

@@ -15,12 +15,12 @@ public class BloqueioSefaz implements Serializable {
 	private static final long serialVersionUID = 2458069693783821498L;
 
 	@NotNull
-	@Column(name = "DT_EXPIRACAO", nullable = false)
+	@Column(name = "DT_EXPIRACAO")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dtExpiracao;
 
 	@NotNull
-	@Column(name = "DT_CADASTRO_BLOQ", nullable = false, columnDefinition = "timestamp without time zone default CURRENT_TIMESTAMP")
+	@Column(name = "DT_CADASTRO_BLOQ")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dtCadastroBloqueio;
 

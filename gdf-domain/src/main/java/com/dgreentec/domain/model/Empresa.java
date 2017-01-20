@@ -38,7 +38,7 @@ public class Empresa extends AbstractEntityVersion {
 
 	@Id
 	@CNPJ
-	@Column(name = "COD_CNPJ")
+	@Column(name = "COD_CNPJ", length = 18)
 	private String cnpj;
 
 	@NotEmpty
@@ -64,8 +64,7 @@ public class Empresa extends AbstractEntityVersion {
 	private BloqueioSefaz bloqueioSefaz;
 
 	@OneToMany(cascade = CascadeType.ALL)
-	@JoinTable(name = "T_EMPRESA_NSU", joinColumns = @JoinColumn(name = "TXT_CNPJ", foreignKey = @ForeignKey(name = "FK_EMPRESA_NSU")), inverseJoinColumns = @JoinColumn(name = "ID_NSU", foreignKey = @ForeignKey(name = "FK_NSU_EMPRESA")), uniqueConstraints = @UniqueConstraint(columnNames = {
-			"TXT_CNPJ", "ID_NSU" }, name = "UNQ_EMPRESA_NSU"))
+	@JoinColumn(name = "COD_CNPJ", foreignKey = @ForeignKey(name = "FK_EMPRESA_NSU"))
 	private List<EventoNSU> nsus = new ArrayList<>();
 
 	public boolean existeBloqueioParaEvento() {
@@ -124,7 +123,8 @@ public class Empresa extends AbstractEntityVersion {
 	}
 
 	public UltimoEventoNSU getUltimoNSU() {
-		if (ultimoNSU==null)return new UltimoEventoNSU();
+		if (ultimoNSU == null)
+			return new UltimoEventoNSU();
 
 		return ultimoNSU;
 	}

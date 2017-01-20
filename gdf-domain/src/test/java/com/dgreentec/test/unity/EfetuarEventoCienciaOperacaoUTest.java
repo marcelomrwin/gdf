@@ -1,4 +1,4 @@
-package com.dgreentec.domain;
+package com.dgreentec.test.unity;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -79,7 +79,7 @@ public class EfetuarEventoCienciaOperacaoUTest {
 		System.clearProperty("javax.net.ssl.trustStore");
 		System.clearProperty("javax.net.ssl.trustStorePassword");
 
-		String certsPath = System.getProperty("user.dir") + "/src/main/resources/certificados";
+		String certsPath = System.getProperty("user.dir") + "/src/test/resources/certificados";
 
 		// rio polem
 		System.setProperty("javax.net.ssl.keyStore", certsPath + File.separator + "07932968000103.pfx");
@@ -119,7 +119,13 @@ public class EfetuarEventoCienciaOperacaoUTest {
 				.append("<detEvento versao=\"").append(versao).append("\">").append("<descEvento>").append(txtEvento)
 				.append("</descEvento>").append("</detEvento>").append("</infEvento>").append("</evento>");
 
-		xml.append(evento.toString());
+		String xmlSemAssinar = evento.toString();
+
+//		String xmlEventoAssinado = assinarEnvioEvento(xmlSemAssinar, "07932968000103.pfx", "RIOPOLEMLTDA");
+//		xml.append(xmlEventoAssinado);
+		
+		xml.append(xmlSemAssinar);
+
 		xml.append("</envEvento>");
 
 		String eventoXML = xml.toString();
@@ -132,7 +138,10 @@ public class EfetuarEventoCienciaOperacaoUTest {
 
 		RecepcaoEventoStub recepcaoEventoStub = new RecepcaoEventoStub(
 				WebServices.getInstanceConfig().getServico(UFEnum.AN, TipoServicoEnum.RecepcaoEvento, ambiente).getUrl());
+
 		OMElement ome = AXIOMUtil.stringToOM(xmlAssinado);
+//		OMElement ome = AXIOMUtil.stringToOM(eventoXML);
+
 		NfeDadosMsg dados = new NfeDadosMsg();
 		dados.setExtraElement(ome);
 
@@ -170,23 +179,23 @@ public class EfetuarEventoCienciaOperacaoUTest {
 		PrivateKey privateKey = (PrivateKey) securities[1];
 
 		NodeList elements = document.getElementsByTagName("infEvento");
-		org.w3c.dom.Element el = (org.w3c.dom.Element) elements.item(0);
-		el.setIdAttribute("Id", true);
-		String id = el.getAttribute("Id");
+		for (int i = 0; i < elements.getLength(); i++) {
+			org.w3c.dom.Element el = (org.w3c.dom.Element) elements.item(i);
+			el.setIdAttribute("Id", true);
+			String id = el.getAttribute("Id");
 
-		Reference ref = signatureFactory.newReference("#" + id, signatureFactory.newDigestMethod(DigestMethod.SHA1, null), transformList,
-				null, null);
+			Reference ref = signatureFactory.newReference("#" + id, signatureFactory.newDigestMethod(DigestMethod.SHA1, null),
+					transformList, null, null);
 
-		SignedInfo si = signatureFactory.newSignedInfo(
-				signatureFactory.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE, (C14NMethodParameterSpec) null),
-				signatureFactory.newSignatureMethod(SignatureMethod.RSA_SHA1, null), Collections.singletonList(ref));
+			SignedInfo si = signatureFactory.newSignedInfo(
+					signatureFactory.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE, (C14NMethodParameterSpec) null),
+					signatureFactory.newSignatureMethod(SignatureMethod.RSA_SHA1, null), Collections.singletonList(ref));
 
-		XMLSignature signature = signatureFactory.newXMLSignature(si, keyInfo);
+			XMLSignature signature = signatureFactory.newXMLSignature(si, keyInfo);
+			DOMSignContext dsc = new DOMSignContext(privateKey, document.getElementsByTagName("evento").item(0));
 
-//		DOMSignContext dsc = new DOMSignContext(privateKey, document.getFirstChild());
-		DOMSignContext dsc = new DOMSignContext(privateKey, document.getElementsByTagName("evento").item(0));
-
-		signature.sign(dsc);
+			signature.sign(dsc);
+		}
 
 		return outputXML(document);
 	}
@@ -212,7 +221,7 @@ public class EfetuarEventoCienciaOperacaoUTest {
 
 	private Object[] loadCertificates(String certificado, String senha, XMLSignatureFactory signatureFactory) throws Exception {
 		Object[] securities = new Object[2];
-		String certsPath = System.getProperty("user.dir") + "/src/main/resources/certificados";
+		String certsPath = System.getProperty("user.dir") + "/src/test/resources/certificados";
 
 		InputStream entrada = new FileInputStream(certsPath + File.separator + certificado);
 		KeyStore ks = KeyStore.getInstance("pkcs12");
@@ -250,6 +259,9 @@ public class EfetuarEventoCienciaOperacaoUTest {
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		TransformerFactory tf = TransformerFactory.newInstance();
 		Transformer trans = tf.newTransformer();
+
+		trans.setOutputProperty("omit-xml-declaration", "yes");
+
 		trans.transform(new DOMSource(doc), new StreamResult(os));
 		String xml = os.toString();
 		if ((xml != null) && (!"".equals(xml))) {

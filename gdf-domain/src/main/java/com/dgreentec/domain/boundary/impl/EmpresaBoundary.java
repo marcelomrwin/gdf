@@ -34,7 +34,13 @@ public class EmpresaBoundary extends AbstractBoundary implements EmpresaService 
 	}
 
 	public Empresa consultarEmpresaPorCnpj(Contrato contrato, String cnpj) {
-		return empresaRepository.consultarPorChave(cnpj);
+		Empresa empresa = empresaRepository.consultarPorChave(cnpj);
+		init(empresa);
+		return empresa;
+	}
+
+	private void init(Empresa empresa) {
+		empresa.getNsus().size();
 	}
 
 }

@@ -1,12 +1,17 @@
 package com.dgreentec.domain.model;
 
 import java.io.ByteArrayInputStream;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
@@ -19,6 +24,12 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+import javax.xml.crypto.dsig.Transform;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 
 import org.hibernate.annotations.Type;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -43,7 +54,7 @@ public class Certificado extends AbstractEntityVersion {
 	@Lob
 	@Column(nullable = false, name = "BIN_ARQUIVO")
 	@NotNull
-	@Type(type="org.hibernate.type.BinaryType")
+	@Type(type = "org.hibernate.type.BinaryType")
 	private byte[] arquivo;
 
 	@NotEmpty
@@ -125,6 +136,27 @@ public class Certificado extends AbstractEntityVersion {
 		loadKeystore();
 		PrivateKey privateKey = (PrivateKey) ks.getKey(alias(), senha.toCharArray());
 		return privateKey;
+	}
+
+	public KeyInfo getKeyInfo(XMLSignatureFactory signatureFactory) throws Exception {
+		List<X509Certificate> x509Content = new ArrayList<X509Certificate>();
+		KeyInfoFactory keyInfoFactory = signatureFactory.getKeyInfoFactory();
+		x509Content.add(getX509Certificate());
+		X509Data x509Data = keyInfoFactory.newX509Data(x509Content);
+		KeyInfo keyInfo = keyInfoFactory.newKeyInfo(Collections.singletonList(x509Data));
+		return keyInfo;
+	}
+
+	private ArrayList<Transform> signatureFactory(XMLSignatureFactory signatureFactory)
+			throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+		ArrayList<Transform> transformList = new ArrayList<Transform>();
+		TransformParameterSpec tps = null;
+		Transform envelopedTransform = signatureFactory.newTransform(Transform.ENVELOPED, tps);
+		Transform c14NTransform = signatureFactory.newTransform("http://www.w3.org/TR/2001/REC-xml-c14n-20010315", tps);
+
+		transformList.add(envelopedTransform);
+		transformList.add(c14NTransform);
+		return transformList;
 	}
 
 	public Long getIdCertificado() {

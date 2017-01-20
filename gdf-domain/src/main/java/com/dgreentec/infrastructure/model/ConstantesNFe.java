@@ -3,7 +3,17 @@ package com.dgreentec.infrastructure.model;
 public interface ConstantesNFe {
 
 	String REJEICAO_593 = "593";
-	String RETORNO_EVENTO_MANIFESTO_138 = "138";
+	
+	String REJEICAO_DUPLICIDADE_EVENTO = "573";
+
+	String RETORNO_EVENTO_LOTE_PROCESSADO = "128";
+
+	String RETORNO_EVENTO_REGISTRADO_VINCULADO_NFE = "135";
+
+	String RETORNO_EVENTO_REGISTRADO_NAO_VINCULADO_NFE = "136";
+
 	String RETORNO_EVENTO_MANIFESTO_137 = "137";
+
+	String RETORNO_EVENTO_MANIFESTO_138 = "138";
 
 }

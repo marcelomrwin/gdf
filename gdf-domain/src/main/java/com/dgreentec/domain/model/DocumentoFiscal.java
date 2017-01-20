@@ -14,12 +14,12 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.dgreentec.infrastructure.model.AbstractEntityBuilder;
 import com.dgreentec.infrastructure.model.AbstractEntityVersion;
 import com.dgreentec.infrastructure.persistence.converter.TipoDocumentoEnumConverter;
 
 @Entity
-@Table(name = "T_DOCUMENTO_FISCAL", indexes = { @Index(name = "IDX_DOC_DOCUMENTO", columnList = "XML_DOCUMENTO"),
-		@Index(name = "IDX_DOC_NUM_DOC", columnList = "NUM_DOCUMENTO") })
+@Table(name = "T_DOCUMENTO_FISCAL", indexes = { @Index(name = "IDX_DOC_NUM_DOC", columnList = "NUM_DOCUMENTO") })
 public class DocumentoFiscal extends AbstractEntityVersion {
 
 	public DocumentoFiscal() {
@@ -46,7 +46,7 @@ public class DocumentoFiscal extends AbstractEntityVersion {
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_ID_DOCUMENTO")
 	@SequenceGenerator(name = "SEQ_ID_DOCUMENTO", sequenceName = "SEQ_ID_DOCUMENTO", allocationSize = 1)
-	@Column(name = "ID_DOCUMENTO",updatable=false)
+	@Column(name = "ID_DOCUMENTO", updatable = false)
 	private Long idDocumento;
 
 	@Convert(converter = TipoDocumentoEnumConverter.class)
@@ -61,7 +61,7 @@ public class DocumentoFiscal extends AbstractEntityVersion {
 	@Column(name = "NUM_DOCUMENTO", nullable = false, length = 50)
 	private String numDocumento;
 
-	@ManyToOne
+	@ManyToOne	
 	@JoinColumn(name = "COD_CNPJ", foreignKey = @ForeignKey(name = "FK_DOC_EMPRESA"))
 	private Empresa empresa;
 
@@ -103,5 +103,34 @@ public class DocumentoFiscal extends AbstractEntityVersion {
 
 	public void setEmpresa(Empresa empresa) {
 		this.empresa = empresa;
+	}
+
+	public static class Builder extends AbstractEntityBuilder<DocumentoFiscal> {
+
+		public Builder comTipoDocumento(TipoDocumentoEnum pTipoDocumento) {
+			this.entity.setTipoDocumento(pTipoDocumento);
+			return this;
+		}
+
+		public Builder comNumDocumento(String pNumDocumento) {
+			this.entity.setNumDocumento(pNumDocumento);
+			return this;
+		}
+
+		public Builder comIdDocumento(Long pIdDocumento) {
+			this.entity.setIdDocumento(pIdDocumento);
+			return this;
+		}
+
+		public Builder comDocumento(String pDocumento) {
+			this.entity.setDocumento(pDocumento);
+			return this;
+		}
+
+		public Builder comEmpresa(Empresa pEmpresa) {
+			this.entity.setEmpresa(pEmpresa);
+			return this;
+		}
+
 	}
 }

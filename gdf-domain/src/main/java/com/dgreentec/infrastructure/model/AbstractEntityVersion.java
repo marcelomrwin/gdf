@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import javax.persistence.Column;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
@@ -58,11 +59,11 @@ public abstract class AbstractEntityVersion implements DomainObject, Cloneable, 
 	protected Integer version;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(columnDefinition = "timestamp without time zone default CURRENT_TIMESTAMP", name = "DAT_CRIACAO")
+	@Column(columnDefinition = "timestamp without time zone default current_timestamp", name = "DAT_CRIACAO")
 	protected Date dataCriacao;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(columnDefinition = "timestamp without time zone default CURRENT_TIMESTAMP", name = "DAT_ULTIMA_ALTERACAO")
+	@Column(columnDefinition = "timestamp without time zone default current_timestamp", name = "DAT_ULTIMA_ALTERACAO")
 	protected Date dataUltimaAlteracao;
 
 	@Transient
@@ -179,7 +180,7 @@ public abstract class AbstractEntityVersion implements DomainObject, Cloneable, 
 	public Field getIdField() {
 		Field id = null;
 		for (Field f : getClass().getDeclaredFields()) {
-			if (f.isAnnotationPresent(Id.class)) {
+			if (f.isAnnotationPresent(Id.class) || f.isAnnotationPresent(EmbeddedId.class)) {
 				id = f;
 				break;
 			}

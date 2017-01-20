@@ -5,8 +5,11 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.Id;
 
@@ -173,24 +176,24 @@ public abstract class AbstractCrudGen {
 			pw.println("package com.dgreentec.domain.boundary.api;");
 			pw.println("import javax.ejb.Local;");
 			pw.println("import com.dgreentec.infrastructure.persistence.pagination.PagedList;");
-
-			pw.println("import " + clazz.getName() + ";");
-			pw.println("import " + clazz.getName() + "_;\n");
+			pw.println("import com.dgreentec.domain.model.Contrato;");
+			pw.println("import " + clazz.getName() + ";");			
 			pw.println("import com.dgreentec.domain.repository.filter.Filtro" + clazz.getSimpleName() + ";");
 
 			pw.println("@Local");
 			pw.println("public interface " + serviceName + " {\n");
 
-			pw.println("PagedList<" + clazz.getSimpleName() + "> consultar" + clazz.getSimpleName() + "s(Filtro" + clazz.getSimpleName()
-					+ " filtro);");
-			pw.println(clazz.getSimpleName() + " adicionar" + clazz.getSimpleName() + "(" + clazz.getSimpleName() + " p"
+			pw.println("PagedList<" + clazz.getSimpleName() + "> consultar" + clazz.getSimpleName() + "s(Contrato contrato,Filtro"
+					+ clazz.getSimpleName() + " filtro);");
+			pw.println(clazz.getSimpleName() + " adicionar" + clazz.getSimpleName() + "(Contrato contrato," + clazz.getSimpleName() + " p"
 					+ clazz.getSimpleName() + ");");
-			pw.println(clazz.getSimpleName() + " atualizar" + clazz.getSimpleName() + "(" + clazz.getSimpleName() + " p"
+			pw.println(clazz.getSimpleName() + " atualizar" + clazz.getSimpleName() + "(Contrato contrato," + clazz.getSimpleName() + " p"
 					+ clazz.getSimpleName() + ");");
-			pw.println("void remover" + clazz.getSimpleName() + "(" + clazz.getSimpleName() + " p" + clazz.getSimpleName() + ");");
+			pw.println("void remover" + clazz.getSimpleName() + "(Contrato contrato," + clazz.getSimpleName() + " p" + clazz.getSimpleName()
+					+ ");");
 
 			pw.println(clazz.getSimpleName() + " consultar" + clazz.getSimpleName() + "Por" + StringUtils.capitalize(idField.getName())
-					+ "(" + idField.getType().getSimpleName() + " " + idField.getName() + ");");
+					+ "(Contrato contrato," + idField.getType().getSimpleName() + " " + idField.getName() + ");");
 
 			pw.println("\n}");
 		}
@@ -206,7 +209,7 @@ public abstract class AbstractCrudGen {
 			pw.println("import com.dgreentec.infrastructure.service.boundary.AbstractBoundary;");
 			pw.println("import com.dgreentec.infrastructure.exception.BusinessException;");
 			pw.println("import com.dgreentec.infrastructure.persistence.pagination.PagedList;\n");
-
+			pw.println("import com.dgreentec.domain.model.Contrato;");
 			pw.println("import com.dgreentec.domain.boundary.api." + serviceName + ";");
 			pw.println("import " + clazz.getName() + ";");
 			pw.println("import com.dgreentec.domain.repository." + clazz.getSimpleName() + "Repository;");
@@ -220,23 +223,23 @@ public abstract class AbstractCrudGen {
 			String repository = StringUtils.uncapitalize(repositoryName);
 			pw.println("private " + repositoryName + " " + repository + ";\n");
 
-			pw.println("public PagedList<" + clazz.getSimpleName() + "> consultar" + clazz.getSimpleName() + "s(Filtro"
+			pw.println("public PagedList<" + clazz.getSimpleName() + "> consultar" + clazz.getSimpleName() + "s(Contrato contrato,Filtro"
 					+ clazz.getSimpleName() + " filtro){");
 			pw.println("return " + repository + ".consultar(filtro);\n}\n");
 
-			pw.println("public " + clazz.getSimpleName() + " adicionar" + clazz.getSimpleName() + "(" + clazz.getSimpleName() + " p"
+			pw.println("public " + clazz.getSimpleName() + " adicionar" + clazz.getSimpleName() + "(Contrato contrato," + clazz.getSimpleName() + " p"
 					+ clazz.getSimpleName() + "){");
 			pw.println("return " + repository + ".adicionar(p" + clazz.getSimpleName() + ");\n}\n");
 
-			pw.println("public " + clazz.getSimpleName() + " atualizar" + clazz.getSimpleName() + "(" + clazz.getSimpleName() + " p"
+			pw.println("public " + clazz.getSimpleName() + " atualizar" + clazz.getSimpleName() + "(Contrato contrato," + clazz.getSimpleName() + " p"
 					+ clazz.getSimpleName() + "){");
 			pw.println("return " + repository + ".atualizar(p" + clazz.getSimpleName() + ");\n}\n");
 
-			pw.println("public void remover" + clazz.getSimpleName() + "(" + clazz.getSimpleName() + " p" + clazz.getSimpleName() + "){");
+			pw.println("public void remover" + clazz.getSimpleName() + "(Contrato contrato," + clazz.getSimpleName() + " p" + clazz.getSimpleName() + "){");
 			pw.println(repository + ".excluir(p" + clazz.getSimpleName() + ");\n}\n");
 
 			pw.println("public " + clazz.getSimpleName() + " consultar" + clazz.getSimpleName() + "Por"
-					+ StringUtils.capitalize(idField.getName()) + "(" + idField.getType().getSimpleName() + " " + idField.getName() + "){");
+					+ StringUtils.capitalize(idField.getName()) + "(Contrato contrato," + idField.getType().getSimpleName() + " " + idField.getName() + "){");
 			pw.println("return " + repository + ".consultarPorChave(" + idField.getName() + ");\n}\n");
 
 			pw.println("}");
@@ -249,7 +252,7 @@ public abstract class AbstractCrudGen {
 		try (PrintWriter pw = new PrintWriter(fileRepository)) {
 			pw.println("package com.dgreentec.domain.repository;");
 
-			pw.println("import com.dgreentec.persistence.ModelRepositoryJPA;");
+			pw.println("import com.dgreentec.infrastructure.persistence.ModelRepositoryJPA;");
 			pw.println("import com.dgreentec.infrastructure.persistence.pagination.PagedList;");
 
 			pw.println("import " + clazz.getName() + ";");
@@ -404,7 +407,7 @@ public abstract class AbstractCrudGen {
 				if (field.getName().equalsIgnoreCase("serialVersionUID"))
 					continue;
 				pw.println("case " + clazz.getSimpleName() + "_." + field.getName().toUpperCase() + ":");
-				pw.println("path = root.get(" + clazz.getSimpleName() + "_." + field.getName().toLowerCase() + ");");
+				pw.println("path = root.get(" + clazz.getSimpleName() + "_." + field.getName() + ");");
 				pw.println("break;");
 			}
 			pw.println("}\n}\nreturn path;\n}");
@@ -415,13 +418,16 @@ public abstract class AbstractCrudGen {
 //			pw.println("Predicate where = criteriaBuilder.conjunction();");
 			pw.println("List<Predicate> ands = new ArrayList<>();");
 			pw.println("// List<Predicate> ors = new ArrayList<>();");
+			Set<String> setFields = new TreeSet<>(Arrays.asList(filterFields));
 			for (Field fd : df) {
-				if (fd.getName().equalsIgnoreCase("serialVersionUID"))
+				if (fd.getName().equalsIgnoreCase("serialVersionUID") || !setFields.contains(fd.getName()))
 					continue;
 				pw.println("if (is" + StringUtils.capitalize(fd.getName()) + "Alterado()){");
-				pw.println("/*exemplo:\nEquals\n" + "ands.add(criteriaBuilder.equal(root.get(ENTIDADE_.ATRIBUTO_EQUALS), getVALUE()));"
-						+ " \nLike\nands.add(criteriaBuilder.like(criteriaBuilder.lower(root.get(ENTIDADE_.ATRIBUTO_LIKE)), \"%\" + getVALUE().toLowerCase() + \"%\"));\n*/");
-				pw.println("ands.add(criteriaBuilder.and(<< AJUSTAR CONDIÇÃO >>));\n}");
+				pw.println("/*exemplo:\nEquals\n" + "ands.add(criteriaBuilder.equal(root.get(" + clazz.getSimpleName() + "_." + fd.getName()
+						+ "), get" + StringUtils.capitalize(fd.getName()) + "()));");
+				pw.println("Like\nands.add(criteriaBuilder.like(criteriaBuilder.lower(root.get(" + clazz.getSimpleName() + "_."
+						+ fd.getName() + "), \"%\" + get" + StringUtils.capitalize(fd.getName()) + ".toLowerCase() + \"%\"));\n*/");
+				pw.println("<< AJUSTAR CONDIÇÃO >>\n}");
 			}
 			pw.println("return criteriaBuilder.and(ands.toArray(new Predicate[ands.size()]));\n}");
 

@@ -1,5 +1,7 @@
 package com.dgreentec.domain.boundary.api;
 
+import java.util.List;
+
 import javax.ejb.Local;
 
 import com.dgreentec.domain.model.Contrato;
@@ -13,7 +15,8 @@ public interface NFeService {
 
 	void processarEventosPorContrato(Contrato contrato, TipoAmbienteEnum ambiente) throws NfeException;
 
-	void processarEventoDocumentoParaEmpresa(Contrato contrato, Empresa empresa, EventoDocumento evDoc);
-
 	void processarEventosPorEmpresa(Contrato contrato, Empresa empresa, TipoAmbienteEnum ambiente) throws NfeException;
+
+	void manifestarEventosCienciaDocumentoResumo(Contrato contrato, List<EventoDocumento> eventos, Empresa empresa,
+			TipoAmbienteEnum ambiente) throws NfeException;
 }

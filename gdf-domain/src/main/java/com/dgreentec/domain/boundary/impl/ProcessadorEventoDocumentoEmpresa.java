@@ -110,11 +110,12 @@ public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumen
 		EventoDocumentoResponse response = new EventoDocumentoResponse();
 		List<EventoDocumento> lista = new LinkedList<>();
 		response.setEventos(lista);
-		//Antes de realizar qualquer ação verifica se existe bloqueio pra empresa na sefaz
+		// Antes de realizar qualquer ação verifica se existe bloqueio pra empresa na sefaz
 		if (!empresa.existeBloqueioParaEvento()) {
 
 			DistDFeInt dist = new ObjectFactory().createDistDFeInt();
-			dist.setVersao("1.00");// FIXME verificar se é possível parametrizar e se vale a pena já que quando uma versão é
+			dist.setVersao("1.00");// FIXME verificar se é possível parametrizar e se vale a pena já que quando uma
+									// versão é
 									// alterada normalmente se precisa mexer no sistema.
 			dist.setTpAmb(ambiente.getTpAmb());
 			dist.setCUFAutor(empresa.getUf().getCodigo());
@@ -140,7 +141,7 @@ public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumen
 			response.setUltimoNSu(retorno.getUltNSU());
 
 			if (retorno.getCStat().equalsIgnoreCase(ConstantesNFe.RETORNO_EVENTO_MANIFESTO_138)) {
-empresa = empresaService.consultarEmpresaPorCnpj(empresa.getContrato(), empresa.getCnpj());
+				empresa = empresaService.consultarEmpresaPorCnpj(empresa.getContrato(), empresa.getCnpj());
 				LoteDistDFeInt loteDistDFeInt = retorno.getLoteDistDFeInt();
 				UltimoEventoNSU ultimo = new UltimoEventoNSU();
 				ultimo.setDataUltimoNSU(NFeDateUtils.converterData(retorno.getDhResp()));
@@ -164,7 +165,8 @@ empresa = empresaService.consultarEmpresaPorCnpj(empresa.getContrato(), empresa.
 						// resumo de NFe, representam notas que foram emitidas para o cnpj mas que não foram
 						// manifestadas pelo destinatário.
 						ResNFe resNFe = JaxbUtils.convertStringXMLToEntity(xml, ResNFe.class);
-						// os resumos de nfe devem ser manifestados manifestar conhecimento da NFe para permitir o download
+						// os resumos de nfe devem ser manifestados manifestar conhecimento da NFe para permitir o
+						// download
 						// futuramente.
 						evDoc.setJaxbObject(resNFe);
 						break;
@@ -190,7 +192,7 @@ empresa = empresaService.consultarEmpresaPorCnpj(empresa.getContrato(), empresa.
 					}
 					}
 
-					//TODO registar cada evento na empresa
+					// TODO registar cada evento na empresa
 					EventoNSU eventoNSU = new EventoNSU();
 					eventoNSU.setIdNsu(evDoc.getNsu());
 					eventoNSU.setDtNSU(new Date());
@@ -206,9 +208,10 @@ empresa = empresaService.consultarEmpresaPorCnpj(empresa.getContrato(), empresa.
 
 				empresa = empresaService.consultarEmpresaPorCnpj(empresa.getContrato(), empresa.getCnpj());
 
-				//após um código 137 a SEFAZ recomenda aguardar em torno de 1 hora antes de realizar a nova chamada, do contrário corre-se o risco de cair numa "lista negra".
+				// após um código 137 a SEFAZ recomenda aguardar em torno de 1 hora antes de realizar a nova chamada, do
+				// contrário corre-se o risco de cair numa "lista negra".
 
-				//Guadar para a empresa uma flag informando que só após 1 hora poderá consultar novamente
+				// Guadar para a empresa uma flag informando que só após 1 hora poderá consultar novamente
 				BloqueioSefaz bloqueio = new BloqueioSefaz();
 				Calendar c = GregorianCalendar.getInstance();
 				c.add(Calendar.HOUR_OF_DAY, 1);
@@ -224,9 +227,9 @@ empresa = empresaService.consultarEmpresaPorCnpj(empresa.getContrato(), empresa.
 
 			}
 
-			//FIXME - processa os ventos aqui? envia por evento cdi? faz chamadas recursivas até receber todos os NSUs?
+			// FIXME - processa os ventos aqui? envia por evento cdi? faz chamadas recursivas até receber todos os NSUs?
 			empresa = empresaService.atualizarEmpresa(empresa.getContrato(), empresa);
-			//			nfeService.processarEventoDocumentoParaEmpresa(empresa.getContrato(), empresa, evDoc);
+			// nfeService.processarEventoDocumentoParaEmpresa(empresa.getContrato(), empresa, evDoc);
 		}
 		return response;
 	}

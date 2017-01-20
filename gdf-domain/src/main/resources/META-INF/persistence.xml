@@ -5,9 +5,13 @@
 	<persistence-unit name="gdf-pu" transaction-type="JTA">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<jta-data-source>java:jboss/datasources/PostgresGDFDS</jta-data-source>
+		<class>com.dgreentec.domain.model.BloqueioSefaz</class>
 		<class>com.dgreentec.domain.model.Certificado</class>
 		<class>com.dgreentec.domain.model.Contrato</class>
+		<class>com.dgreentec.domain.model.DocumentoFiscal</class>
 		<class>com.dgreentec.domain.model.Empresa</class>
+		<class>com.dgreentec.domain.model.EventoNSU</class>
+		<class>com.dgreentec.domain.model.LoteEvento</class>
 		<class>com.dgreentec.domain.model.UltimoEventoNSU</class>
 		<class>com.dgreentec.infrastructure.model.AbstractEntityVersion</class>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>

@@ -77,31 +77,6 @@ public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumen
 
 	private TipoAmbienteEnum ambiente;
 
-	//	@Inject
-	//	public ProcessadorEventoDocumentoEmpresa(InjectionPoint ip) {
-	//		configureValues(ip);
-	//	}
-
-	//	private void configureValues(InjectionPoint ip) {
-	//		ProcessadorEventoDocumento evento = null;
-	//		for (Annotation annotation : ip.getQualifiers()) {
-	//			if (annotation.annotationType().equals(ProcessadorEventoDocumento.class)) {
-	//				evento = (ProcessadorEventoDocumento) annotation;
-	//				break;
-	//			}
-	//		}
-	//
-	//		if (evento != null) {
-	//			long idTenant = evento.idTenant();
-	//			cnpj = evento.cnpj();
-	//			ambiente = evento.ambiente();
-	//			TenantService tenantService = CDIUtils.getInstance().getBeanInstance(TenantService.class);
-	//			tenant = tenantService.consultarTenantPorIdTenant(idTenant);
-	//
-	//		} else
-	//			throw new IllegalStateException("No @ProcessadorEventoDocumento on InjectionPoint");
-	//	}
-
 	@Override
 	public EventoDocumentoResponse call() throws Exception {
 		return consultarEventosDaEmpresa();

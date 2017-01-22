@@ -104,10 +104,6 @@ public abstract class GenericModelRepository<T extends AbstractEntityVersion> ex
 
 		super.create(entity);
 
-		id = entity.getIdValue();
-		if (id != null)
-			entity = consultarPorChave(id);
-
 		return entity;
 	}
 
@@ -174,9 +170,6 @@ public abstract class GenericModelRepository<T extends AbstractEntityVersion> ex
 		}, BusinessException.GENERIC_UPDATE_OPERATION);
 
 		T nEntity = super.update(entity);
-
-		Serializable id = nEntity.getIdValue();
-		nEntity = consultarPorChave(id);
 
 		return nEntity;
 	}

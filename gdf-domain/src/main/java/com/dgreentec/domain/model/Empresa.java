@@ -44,7 +44,7 @@ public class Empresa extends AbstractEntityVersion {
 	private String nome;
 
 	@ManyToOne
-	@NotNull(message="Empresa deve possuir um contrato obrigatoriamente")
+	@NotNull(message = "Empresa deve possuir um contrato obrigatoriamente")
 	private Contrato contrato;
 
 	@NotNull
@@ -179,6 +179,113 @@ public class Empresa extends AbstractEntityVersion {
 
 	public void setNsus(List<EventoNSU> nsus) {
 		this.nsus = nsus;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((bloqueioSefaz == null) ? 0 : bloqueioSefaz.hashCode());
+		result = prime * result + ((certificado == null) ? 0 : certificado.hashCode());
+		result = prime * result + ((cnpj == null) ? 0 : cnpj.hashCode());
+		result = prime * result + ((contrato == null) ? 0 : contrato.hashCode());
+		result = prime * result + ((nome == null) ? 0 : nome.hashCode());
+		result = prime * result + ((nsus == null) ? 0 : nsus.hashCode());
+		result = prime * result + ((uf == null) ? 0 : uf.hashCode());
+		result = prime * result + ((ultimoNSU == null) ? 0 : ultimoNSU.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (!(obj instanceof Empresa)) {
+			return false;
+		}
+		Empresa other = (Empresa) obj;
+		if (bloqueioSefaz == null) {
+			if (other.bloqueioSefaz != null) {
+				return false;
+			}
+		} else if (!bloqueioSefaz.equals(other.bloqueioSefaz)) {
+			return false;
+		}
+		if (certificado == null) {
+			if (other.certificado != null) {
+				return false;
+			}
+		} else if (!certificado.equals(other.certificado)) {
+			return false;
+		}
+		if (cnpj == null) {
+			if (other.cnpj != null) {
+				return false;
+			}
+		} else if (!cnpj.equals(other.cnpj)) {
+			return false;
+		}
+		if (contrato == null) {
+			if (other.contrato != null) {
+				return false;
+			}
+		} else if (!contrato.equals(other.contrato)) {
+			return false;
+		}
+		if (nome == null) {
+			if (other.nome != null) {
+				return false;
+			}
+		} else if (!nome.equals(other.nome)) {
+			return false;
+		}
+		if (nsus == null) {
+			if (other.nsus != null) {
+				return false;
+			}
+		} else if (!nsus.equals(other.nsus)) {
+			return false;
+		}
+		if (uf != other.uf) {
+			return false;
+		}
+		if (ultimoNSU == null) {
+			if (other.ultimoNSU != null) {
+				return false;
+			}
+		} else if (!ultimoNSU.equals(other.ultimoNSU)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		final int maxLen = 10;
+		StringBuilder builder2 = new StringBuilder();
+		builder2.append("Empresa [");
+		if (cnpj != null)
+			builder2.append("cnpj=").append(cnpj).append(", ");
+		if (nome != null)
+			builder2.append("nome=").append(nome).append(", ");
+		if (contrato != null)
+			builder2.append("contrato=").append(contrato).append(", ");
+		if (uf != null)
+			builder2.append("uf=").append(uf).append(", ");
+		if (certificado != null)
+			builder2.append("certificado=").append(certificado).append(", ");
+		if (ultimoNSU != null)
+			builder2.append("ultimoNSU=").append(ultimoNSU).append(", ");
+		if (bloqueioSefaz != null)
+			builder2.append("bloqueioSefaz=").append(bloqueioSefaz).append(", ");
+		if (nsus != null)
+			builder2.append("nsus=").append(nsus.subList(0, Math.min(nsus.size(), maxLen)));
+		builder2.append("]");
+		return builder2.toString();
 	}
 
 }

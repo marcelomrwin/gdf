@@ -55,7 +55,7 @@ import com.dgreentec.domain.boundary.api.EmpresaService;
 import com.dgreentec.domain.boundary.api.NFeService;
 import com.dgreentec.domain.boundary.api.TenantService;
 import com.dgreentec.domain.boundary.impl.ContratoBoundary;
-import com.dgreentec.domain.boundary.impl.NFeServiceBean;
+import com.dgreentec.domain.boundary.impl.NFeServiceBoundary;
 
 @RunWith(Arquillian.class)
 @Category(IntegrationTest.class)
@@ -80,7 +80,7 @@ public class CadastroContratoIT extends AbstractTestCase {
 		JavaArchive deploy = getEJBDeploy(DATABASE.POSTGRES_DESENV, true);
 
 		deploy.addPackages(true, Contrato.class.getPackage(), ContratoRepository.class.getPackage(), NFeService.class.getPackage(),
-				NFeServiceBean.class.getPackage(), XSDObject.class.getPackage());
+				NFeServiceBoundary.class.getPackage(), XSDObject.class.getPackage());
 
 		deploy.as(ZipExporter.class).exportTo(new File("/tmp/arquillian_test.jar"), true);
 		return deploy;

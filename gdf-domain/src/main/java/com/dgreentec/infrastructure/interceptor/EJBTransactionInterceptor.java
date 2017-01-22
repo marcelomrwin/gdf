@@ -6,12 +6,10 @@ import javax.inject.Inject;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.InvocationContext;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.transaction.Status;
 import javax.transaction.TransactionSynchronizationRegistry;
 
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class EJBTransactionInterceptor {
 
@@ -19,12 +17,12 @@ public class EJBTransactionInterceptor {
 		super();
 	}
 
-	Logger logger = LoggerFactory.getLogger(getClass());
+	@Inject
+	protected Logger logger;
 
 	@Resource
 	TransactionSynchronizationRegistry tsr;
 
-//	@PersistenceContext
 	@Inject
 	protected EntityManager entityManager;
 
@@ -43,7 +41,7 @@ public class EJBTransactionInterceptor {
 			return obj;
 		} catch (Exception e) {
 			// TODO encapsular a exceção e devolver mensagem padronizada.
-			logger.debug(e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 			throw e;
 		}
 	}

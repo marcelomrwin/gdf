@@ -105,15 +105,10 @@ public abstract class AbstractTestCase {
 		File[] libs = resolveDependencies(deps, withTransitivity);
 
 		WebArchive archive = ShrinkWrap.create(WebArchive.class, "ArquillianWebProject.war")
-				.addPackages(true, AbstractTestCase.class.getPackage(), ConfigurationManager.class.getPackage(),
-						InfraException.class.getPackage(), TransactionMultitenancyInterceptor.class.getPackage(),
-						MultiTenantProvider.class.getPackage(), AbstractEntityVersion.class.getPackage(), RepositoryJPA.class.getPackage(),
-						SchemaResolver.class.getPackage(), ThreadLocalCert.class.getPackage(), JaxbUtils.class.getPackage(),
-						NFeDistribuicaoDFeStub.class.getPackage(), NfeStatusServico2Stub.class.getPackage(),
-						RecepcaoEventoStub.class.getPackage(), AbstractBoundary.class.getPackage())
+				.addPackages(true, "br.inf.portalfiscal.www.nfe.wsdl", "com.dgreentec")
 				.addAsWebInfResource("test-faces-config.xml", "faces-config.xml").addAsWebInfResource("jboss-deployment-structure.xml")
 				.addAsResource("META-INF/" + pDataBase.getPersistence(), "META-INF/persistence.xml").addAsResource("config")
-				.addAsResource("keystore").addAsResource("META-INF/orm.xml", "META-INF/orm.xml").addAsWebInfResource("META-INF/ejb-jar.xml")
+				.addAsResource("keystore").addAsResource("META-INF/orm.xml", "META-INF/orm.xml")
 				.addAsWebInfResource("META-INF/beans.xml", "beans.xml").addAsLibraries(libs);
 
 		return archive;

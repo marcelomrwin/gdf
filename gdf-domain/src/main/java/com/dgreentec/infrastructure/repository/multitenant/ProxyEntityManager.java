@@ -1,6 +1,7 @@
 package com.dgreentec.infrastructure.repository.multitenant;
 
 import java.lang.reflect.Proxy;
+import java.util.Date;
 
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
@@ -9,15 +10,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.dgreentec.domain.model.Tenant;
 
 /**
  * This EntityManager producer returns always a Proxy. All the EntityManager methods are wrapped by this proxy. This ensures,
  * that the real EntityManager is obtained/created at call time, not in injection time and can react to Tenant changes between
  * injection and EM method call.
  */
-@RequestScoped
+//@RequestScoped
 public class ProxyEntityManager {
 
 	/**
@@ -36,8 +36,6 @@ public class ProxyEntityManager {
 	@Inject
 	private TenantRegistry tenantRegistry;
 
-	private static final Logger logger = LoggerFactory.getLogger(ProxyEntityManager.class);
-
 	/**
 	 * CDI Producer. Checks if there is a tenant name in ThreadLocal storage {@link TenantHolder}. If yes, load tenant from
 	 * {@link TenantRegistry},
@@ -54,11 +52,18 @@ public class ProxyEntityManager {
 		if (currentTenant != null) {
 
 			EntityManagerFactory emf = tenantRegistry.getEntityManagerFactory(currentTenant);
-			if (emf == null)
+
+			debug("return entityManager for tenant " + currentTenant);
+
+			if (emf == null) {
 				target = entityManager;
-			else
+				debug("returning default entityManager");
+			} else {
 				target = emf.createEntityManager();
+				debug("return entityManager for tentnat " + currentTenant);
+			}
 		} else {
+			debug("returning default entityManager");
 			target = entityManager;
 		}
 		return (EntityManager) Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class<?>[] { EntityManager.class },
@@ -66,5 +71,10 @@ public class ProxyEntityManager {
 					target.joinTransaction();
 					return method.invoke(target, args);
 				});
+	}
+
+	protected void debug(String text) {
+		System.out.println("** DEBUG BEGIN ** |" + getClass().getName() + ":" + Thread.currentThread().getStackTrace()[2].getLineNumber()
+				+ " | " + new Date() + " | " + text + "| ** DEBUG END **");
 	}
 }

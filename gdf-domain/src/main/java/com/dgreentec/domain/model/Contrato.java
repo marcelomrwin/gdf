@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -18,8 +17,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 
@@ -32,7 +29,6 @@ import com.dgreentec.infrastructure.util.CPFCNPJUtil;
 @Entity
 @Table(name = "T_CONTRATO", indexes = {
 		@Index(name = "IDX_CNPJ", columnList = "COD_CNPJ") }, uniqueConstraints = @UniqueConstraint(name = "UNQ_CONTRATO_CNPJ", columnNames = "COD_CNPJ"))
-@Cacheable
 public class Contrato extends AbstractEntityVersion {
 
 	private static final long serialVersionUID = -7508503257018177408L;

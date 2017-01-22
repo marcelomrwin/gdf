@@ -1,6 +1,7 @@
 create sequence comum.ID_TENANT_SEQ start 1 increment 1
 create table comum.T_TENANT (ID_TENANT int8 not null, DAT_CRIACAO timestamp without time zone not null, DAT_ULTIMA_ALTERACAO timestamp without time zone not null, NUM_VERSAO INTEGER DEFAULT 0 not null, TXT_NM_TENANT varchar(255) not null, TXT_NM_ESQUEMA varchar(255) not null, primary key (ID_TENANT))
-create table comum.T_USUARIO (NUM_CPF varchar(255) not null, DAT_CRIACAO timestamp without time zone not null, DAT_ULTIMA_ALTERACAO timestamp without time zone not null, NUM_VERSAO INTEGER DEFAULT 0 not null, TXT_NOME varchar(255) not null, primary key (NUM_CPF))
+create table comum.T_USUARIO (NUM_CPF varchar(11) not null, DAT_CRIACAO timestamp without time zone not null, DAT_ULTIMA_ALTERACAO timestamp without time zone not null, NUM_VERSAO INTEGER DEFAULT 0 not null, TXT_NOME varchar(250) not null, primary key (NUM_CPF))
+create table comum.T_USUARIO_TENANT (NUM_CPF varchar(11) not null, ID_TENANT int8 not null, primary key (NUM_CPF, ID_TENANT))
 alter table comum.T_TENANT add constraint UK_e9jfor3x67qn86f0yr81gvw7o unique (TXT_NM_ESQUEMA)
 create sequence SEQ_ID_CERTIFICADO start 1 increment 1
 create sequence SEQ_ID_CONTRATO start 1 increment 1
@@ -15,17 +16,16 @@ create table T_EMPRESA (COD_CNPJ varchar(18) not null, DAT_CRIACAO timestamp wit
 create table T_EVENTO_NSU (ID_SEQ_EVENTO_NSU int8 not null, DAT_CRIACAO timestamp without time zone not null, DAT_ULTIMA_ALTERACAO timestamp without time zone not null, NUM_VERSAO INTEGER DEFAULT 0 not null, COD_CNPJ varchar(255), DT_NSU timestamp without time zone not null, ID_NSU int8, TXT_OBSERVACAO varchar(500), TP_SCHEMA varchar(255), primary key (ID_SEQ_EVENTO_NSU))
 create table T_LOG_EVENTO_NOTIF (ID_SEQ_LOG_EVENTO int8 not null, DAT_CRIACAO timestamp without time zone not null, DAT_ULTIMA_ALTERACAO timestamp without time zone not null, NUM_VERSAO INTEGER DEFAULT 0 not null, COD_UF_ORGAO int4, COD_STATUS int4, TXT_CHAVE_NFE varchar(44), DT_REGISTRO timestamp, COD_PROTOCOLO varchar(15), NUM_SEQ_EVENTO int4, IND_TP_AMBIENTE int4, COD_TP_EVENTO int4, TXT_VERSAO_APP varchar(100), TXT_EVENTO varchar(255), TXT_MOTIVO varchar(255), primary key (ID_SEQ_LOG_EVENTO))
 create table T_LOTE_EVENTO (ID_LOTE int4 not null, DAT_CRIACAO timestamp without time zone not null, DAT_ULTIMA_ALTERACAO timestamp without time zone not null, NUM_VERSAO INTEGER DEFAULT 0 not null, COD_CNPJ varchar(18) not null, primary key (ID_LOTE))
-create table T_USUARIO_TENANT (NUM_CPF varchar(255) not null, ID_TENANT int8 not null, primary key (NUM_CPF, ID_TENANT))
 create index IDX_CNPJ on T_CONTRATO (COD_CNPJ)
 alter table T_CONTRATO add constraint UK_juinfrh087xijwtxoivad110i unique (COD_CNPJ)
 create index IDX_DOC_NUM_DOC on T_DOCUMENTO_FISCAL (NUM_DOCUMENTO)
 create index IDX_NM_EMPRESA on T_EMPRESA (TXT_NOME)
 alter table T_EVENTO_NSU add constraint UNQ_EMPRESA_NSU unique (COD_CNPJ, ID_NSU)
+alter table comum.T_USUARIO_TENANT add constraint FK_TENANT_USUARIO foreign key (ID_TENANT) references comum.T_TENANT
+alter table comum.T_USUARIO_TENANT add constraint FK_USUARIO_TENANT foreign key (NUM_CPF) references comum.T_USUARIO
 alter table T_CONTRATO add constraint FK_TENANT_CONTRATO foreign key (COD_TENANT) references comum.T_TENANT
 alter table T_DOCUMENTO_FISCAL add constraint FK_DOC_EMPRESA foreign key (COD_CNPJ) references T_EMPRESA
 alter table T_EMPRESA add constraint FK37b7jnaila1k0megwoarntbjj foreign key (certificado_ID_CERTIFICADO) references T_CERTIFICADO
 alter table T_EMPRESA add constraint FKknubp1vuqonef37898gxwrs19 foreign key (contrato_ID_CONTRATO) references T_CONTRATO
 alter table T_EVENTO_NSU add constraint FK_EMPRESA_NSU foreign key (COD_CNPJ) references T_EMPRESA
 alter table T_LOTE_EVENTO add constraint FK_LOTE_EVENTO_EMPRESA foreign key (COD_CNPJ) references T_EMPRESA
-alter table T_USUARIO_TENANT add constraint FK4mjuybymd2jd9gu2xax856gyr foreign key (ID_TENANT) references comum.T_TENANT
-alter table T_USUARIO_TENANT add constraint FK7frx2argr2j22x5s005p18ni3 foreign key (NUM_CPF) references comum.T_USUARIO

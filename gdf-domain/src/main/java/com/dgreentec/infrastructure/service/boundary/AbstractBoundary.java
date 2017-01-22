@@ -1,5 +1,6 @@
 package com.dgreentec.infrastructure.service.boundary;
 
+import java.util.Date;
 import java.util.Set;
 
 import javax.enterprise.inject.Instance;
@@ -23,21 +24,14 @@ import com.dgreentec.infrastructure.model.AbstractEntityVersion;
 
 public abstract class AbstractBoundary {
 
-	protected Logger logger = LoggerFactory.getLogger(getClass());
+	@Inject
+	protected Logger logger;
 
 	@Inject
 	protected Instance<TransactionSynchronizationRegistry> registry;
 
 	@Inject
 	protected Validator validator;
-
-//	@PersistenceContext
-
-//	protected EntityManager em;
-
-//	protected void flushCurrentEntityManager() {
-//		em.flush();
-//	}
 
 	protected UserTransaction lookupUserTransaction() {
 		UserTransaction ut = null;
@@ -66,5 +60,10 @@ public abstract class AbstractBoundary {
 		Set<ConstraintViolation<T>> exceptions = validator.validate(entity);
 		if (exceptions != null && !exceptions.isEmpty())
 			throw new ConstraintViolationBusinessException(exceptions);
+	}
+
+	protected void debug(String text) {
+		System.out.println("** DEBUG BEGIN ** |" + getClass().getName() + ":" + Thread.currentThread().getStackTrace()[2].getLineNumber()
+				+ " | " + new Date() + " | " + text + "| ** DEBUG END **");
 	}
 }

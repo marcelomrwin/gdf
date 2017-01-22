@@ -6,6 +6,7 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -216,6 +217,75 @@ public class Certificado extends AbstractEntityVersion {
 
 	public void setDataVencimento(Date dataVencimento) {
 		this.dataVencimento = dataVencimento;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + Arrays.hashCode(arquivo);
+		result = prime * result + ((dataVencimento == null) ? 0 : dataVencimento.hashCode());
+		result = prime * result + ((idCertificado == null) ? 0 : idCertificado.hashCode());
+		result = prime * result + ((senha == null) ? 0 : senha.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (!(obj instanceof Certificado)) {
+			return false;
+		}
+		Certificado other = (Certificado) obj;
+		if (!Arrays.equals(arquivo, other.arquivo)) {
+			return false;
+		}
+		if (dataVencimento == null) {
+			if (other.dataVencimento != null) {
+				return false;
+			}
+		} else if (!dataVencimento.equals(other.dataVencimento)) {
+			return false;
+		}
+		if (idCertificado == null) {
+			if (other.idCertificado != null) {
+				return false;
+			}
+		} else if (!idCertificado.equals(other.idCertificado)) {
+			return false;
+		}
+		if (senha == null) {
+			if (other.senha != null) {
+				return false;
+			}
+		} else if (!senha.equals(other.senha)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		final int maxLen = 10;
+		StringBuilder builder2 = new StringBuilder();
+		builder2.append("Certificado [");
+		if (idCertificado != null)
+			builder2.append("idCertificado=").append(idCertificado).append(", ");
+		if (arquivo != null)
+			builder2.append("arquivo=").append(Arrays.toString(Arrays.copyOf(arquivo, Math.min(arquivo.length, maxLen)))).append(", ");
+		if (senha != null)
+			builder2.append("senha=").append(senha).append(", ");
+		if (cert != null)
+			builder2.append("cert=").append(cert.getSubjectDN()).append(", ");
+		if (dataVencimento != null)
+			builder2.append("dataVencimento=").append(dataVencimento);
+		builder2.append("]");
+		return builder2.toString();
 	}
 
 }

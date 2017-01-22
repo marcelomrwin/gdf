@@ -221,4 +221,154 @@ public class LogEventoNotificacao extends AbstractEntityVersion {
 
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((cOrgao == null) ? 0 : cOrgao.hashCode());
+		result = prime * result + ((cStat == null) ? 0 : cStat.hashCode());
+		result = prime * result + ((chNFe == null) ? 0 : chNFe.hashCode());
+		result = prime * result + ((dhRegEvento == null) ? 0 : dhRegEvento.hashCode());
+		result = prime * result + ((idLogEvento == null) ? 0 : idLogEvento.hashCode());
+		result = prime * result + ((nProt == null) ? 0 : nProt.hashCode());
+		result = prime * result + ((nSeqEvento == null) ? 0 : nSeqEvento.hashCode());
+		result = prime * result + ((tpAmb == null) ? 0 : tpAmb.hashCode());
+		result = prime * result + ((tpEvento == null) ? 0 : tpEvento.hashCode());
+		result = prime * result + ((verAplic == null) ? 0 : verAplic.hashCode());
+		result = prime * result + ((xEvento == null) ? 0 : xEvento.hashCode());
+		result = prime * result + ((xMotivo == null) ? 0 : xMotivo.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (!super.equals(obj)) {
+			return false;
+		}
+		if (!(obj instanceof LogEventoNotificacao)) {
+			return false;
+		}
+		LogEventoNotificacao other = (LogEventoNotificacao) obj;
+		if (cOrgao == null) {
+			if (other.cOrgao != null) {
+				return false;
+			}
+		} else if (!cOrgao.equals(other.cOrgao)) {
+			return false;
+		}
+		if (cStat == null) {
+			if (other.cStat != null) {
+				return false;
+			}
+		} else if (!cStat.equals(other.cStat)) {
+			return false;
+		}
+		if (chNFe == null) {
+			if (other.chNFe != null) {
+				return false;
+			}
+		} else if (!chNFe.equals(other.chNFe)) {
+			return false;
+		}
+		if (dhRegEvento == null) {
+			if (other.dhRegEvento != null) {
+				return false;
+			}
+		} else if (!dhRegEvento.equals(other.dhRegEvento)) {
+			return false;
+		}
+		if (idLogEvento == null) {
+			if (other.idLogEvento != null) {
+				return false;
+			}
+		} else if (!idLogEvento.equals(other.idLogEvento)) {
+			return false;
+		}
+		if (nProt == null) {
+			if (other.nProt != null) {
+				return false;
+			}
+		} else if (!nProt.equals(other.nProt)) {
+			return false;
+		}
+		if (nSeqEvento == null) {
+			if (other.nSeqEvento != null) {
+				return false;
+			}
+		} else if (!nSeqEvento.equals(other.nSeqEvento)) {
+			return false;
+		}
+		if (tpAmb == null) {
+			if (other.tpAmb != null) {
+				return false;
+			}
+		} else if (!tpAmb.equals(other.tpAmb)) {
+			return false;
+		}
+		if (tpEvento == null) {
+			if (other.tpEvento != null) {
+				return false;
+			}
+		} else if (!tpEvento.equals(other.tpEvento)) {
+			return false;
+		}
+		if (verAplic == null) {
+			if (other.verAplic != null) {
+				return false;
+			}
+		} else if (!verAplic.equals(other.verAplic)) {
+			return false;
+		}
+		if (xEvento == null) {
+			if (other.xEvento != null) {
+				return false;
+			}
+		} else if (!xEvento.equals(other.xEvento)) {
+			return false;
+		}
+		if (xMotivo == null) {
+			if (other.xMotivo != null) {
+				return false;
+			}
+		} else if (!xMotivo.equals(other.xMotivo)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder2 = new StringBuilder();
+		builder2.append("LogEventoNotificacao [");
+		if (idLogEvento != null)
+			builder2.append("idLogEvento=").append(idLogEvento).append(", ");
+		if (tpAmb != null)
+			builder2.append("tpAmb=").append(tpAmb).append(", ");
+		if (verAplic != null)
+			builder2.append("verAplic=").append(verAplic).append(", ");
+		if (cOrgao != null)
+			builder2.append("cOrgao=").append(cOrgao).append(", ");
+		if (cStat != null)
+			builder2.append("cStat=").append(cStat).append(", ");
+		if (xMotivo != null)
+			builder2.append("xMotivo=").append(xMotivo).append(", ");
+		if (chNFe != null)
+			builder2.append("chNFe=").append(chNFe).append(", ");
+		if (tpEvento != null)
+			builder2.append("tpEvento=").append(tpEvento).append(", ");
+		if (xEvento != null)
+			builder2.append("xEvento=").append(xEvento).append(", ");
+		if (nSeqEvento != null)
+			builder2.append("nSeqEvento=").append(nSeqEvento).append(", ");
+		if (dhRegEvento != null)
+			builder2.append("dhRegEvento=").append(dhRegEvento).append(", ");
+		if (nProt != null)
+			builder2.append("nProt=").append(nProt);
+		builder2.append("]");
+		return builder2.toString();
+	}
+
 }

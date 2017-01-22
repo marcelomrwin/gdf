@@ -2,21 +2,20 @@ package com.dgreentec.domain.boundary.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.annotation.Resource;
 import javax.ejb.Asynchronous;
@@ -47,18 +46,19 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.util.AXIOMUtil;
-import org.apache.commons.httpclient.protocol.Protocol;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.dgreentec.domain.boundary.api.DocumentoFiscalService;
+import com.dgreentec.domain.boundary.api.EmpresaService;
 import com.dgreentec.domain.boundary.api.LogEventoNotificacaoService;
 import com.dgreentec.domain.boundary.api.LoteEventoService;
 import com.dgreentec.domain.boundary.api.NFeService;
+import com.dgreentec.domain.boundary.impl.eventodocumento.ProcessadorEventoDocumentoEmpresa;
+import com.dgreentec.domain.boundary.impl.eventodocumento.ProcessadorEventoDocumentoLiteral;
+import com.dgreentec.domain.boundary.impl.eventodocumento.ProcessadorEventoNotificacao;
 import com.dgreentec.domain.model.Certificado;
 import com.dgreentec.domain.model.Contrato;
 import com.dgreentec.domain.model.DocumentoFiscal;
@@ -70,9 +70,7 @@ import com.dgreentec.domain.model.LoteEvento;
 import com.dgreentec.domain.model.Tenant;
 import com.dgreentec.domain.model.TipoAmbienteEnum;
 import com.dgreentec.domain.model.TipoDocumentoEnum;
-import com.dgreentec.domain.model.TipoServicoEnum;
 import com.dgreentec.domain.model.UFEnum;
-import com.dgreentec.domain.repository.EmpresaRepository;
 import com.dgreentec.domain.xsd.procEventoNFe_v100.ProcEventoNFe;
 import com.dgreentec.domain.xsd.procNFe_v310.NfeProc;
 import com.dgreentec.domain.xsd.resEvento_v101.ResEvento;
@@ -80,26 +78,16 @@ import com.dgreentec.domain.xsd.resNFe_v101.ResNFe;
 import com.dgreentec.domain.xsd.retEnvEvento_v100.RetEnvEvento;
 import com.dgreentec.domain.xsd.retEnvEvento_v100.TRetEvento;
 import com.dgreentec.domain.xsd.retEnvEvento_v100.TRetEvento.InfEvento;
-import com.dgreentec.infrastructure.configuration.nfe.WebServices;
 import com.dgreentec.infrastructure.exception.NfeException;
 import com.dgreentec.infrastructure.interceptor.EJBTransactionInterceptor;
 import com.dgreentec.infrastructure.model.ConstantesNFe;
 import com.dgreentec.infrastructure.repository.multitenant.TenantInterceptor;
-import com.dgreentec.infrastructure.ssl.SocketFactoryDinamico;
+import com.dgreentec.infrastructure.service.boundary.AbstractBoundary;
 import com.dgreentec.infrastructure.util.NFeDateUtils;
-
-import br.inf.portalfiscal.www.nfe.wsdl.nfedistribuicaodfe.NFeDistribuicaoDFeStub;
-import br.inf.portalfiscal.www.nfe.wsdl.nfedistribuicaodfe.NFeDistribuicaoDFeStub.NfeDistDFeInteresse;
-import br.inf.portalfiscal.www.nfe.wsdl.nfedistribuicaodfe.NFeDistribuicaoDFeStub.NfeDistDFeInteresseResponse;
-import br.inf.portalfiscal.www.nfe.wsdl.recepcaoevento.RecepcaoEventoStub;
-import br.inf.portalfiscal.www.nfe.wsdl.recepcaoevento.RecepcaoEventoStub.NfeCabecMsg;
-import br.inf.portalfiscal.www.nfe.wsdl.recepcaoevento.RecepcaoEventoStub.NfeCabecMsgE;
-import br.inf.portalfiscal.www.nfe.wsdl.recepcaoevento.RecepcaoEventoStub.NfeDadosMsg;
-import br.inf.portalfiscal.www.nfe.wsdl.recepcaoevento.RecepcaoEventoStub.NfeRecepcaoEventoResult;
 
 @Stateless
 @Interceptors({ TenantInterceptor.class, EJBTransactionInterceptor.class })
-public class NFeServiceBean implements NFeService {
+public class NFeServiceBoundary extends AbstractBoundary implements NFeService {
 
 	@Inject
 	protected Logger logger;
@@ -113,12 +101,13 @@ public class NFeServiceBean implements NFeService {
 	@Inject
 	private LoteEventoService loteEventoService;
 
-	@Inject
-	@Any
-	protected Instance<ProcessadorEventoDocumentoEmpresa> processadorEventoInstance;
+	//	@Inject	@Any protected Instance<ProcessadorEventoDocumentoEmpresa> processadorEventoInstance;
 
 	@Inject
 	protected LogEventoNotificacaoService logEventoNotificacaoService;
+
+	@Inject
+	protected EmpresaService empresaService;
 
 	@Override
 	@Asynchronous
@@ -136,9 +125,10 @@ public class NFeServiceBean implements NFeService {
 
 	}
 
-	private Future<EventoDocumentoResponse> scheduleProcess(Tenant tenant, String pCNPJ, TipoAmbienteEnum ambiente) {
-		ProcessadorEventoDocumentoEmpresa processador = processadorEventoInstance
-				.select(new ProcessadorEventoDocumentoLiteral(tenant.getIdTenant(), pCNPJ, ambiente)).get();
+	private Future<EventoDocumentoResponse> scheduleProcess(Tenant tenant, Empresa empresa, TipoAmbienteEnum ambiente) {
+		ProcessadorEventoDocumentoEmpresa processador = new ProcessadorEventoDocumentoEmpresa(empresaService, empresa, tenant, ambiente); //processadorEventoInstance.select(new ProcessadorEventoDocumentoLiteral(tenant.getIdTenant(), pCNPJ, ambiente)).get();
+
+		debug("agendando para a instancia " + processador + " " + tenant + "| Empresa: " + empresa);
 
 		Future<EventoDocumentoResponse> future = executor.submit(processador);
 		return future;
@@ -150,10 +140,16 @@ public class NFeServiceBean implements NFeService {
 			throws NfeException {
 		EventoDocumentoResponse eventosDaEmpresa = null;
 		do {
-			Future<EventoDocumentoResponse> future = scheduleProcess(tenant, empresa.getCnpj(), ambiente);
+			debug("Fez pesquisa! [" + tenant + "]" + empresa);
+			Future<EventoDocumentoResponse> future = scheduleProcess(tenant, empresa, ambiente);
 			try {
-				eventosDaEmpresa = future.get();
-			} catch (InterruptedException | ExecutionException e) {
+				debug("aguardando get() da pesquisa! [" + tenant + "]" + empresa + " Future: " + future);
+
+				eventosDaEmpresa = future.get(1, TimeUnit.MINUTES);
+
+				debug("get() Fez pesquisa retornou [" + tenant + "]" + empresa);
+
+			} catch (InterruptedException | ExecutionException | TimeoutException e) {
 				throw new NfeException(e);
 			}
 
@@ -197,7 +193,7 @@ public class NFeServiceBean implements NFeService {
 			manifestarEventosCienciaDocumentoResumo(tenant, contrato, resumos, empresa, ambiente);
 
 		} while (eventosDaEmpresa.possuiEventoRestante());
-
+		debug("Encerrando fez pesquisa! " + tenant + " - " + empresa);
 	}
 
 	@Override
@@ -206,6 +202,7 @@ public class NFeServiceBean implements NFeService {
 			TipoAmbienteEnum ambiente) throws NfeException {
 		// TODO melhorar o tratamento try/catch
 		try {
+			debug(" Manifestando resumo " + tenant + " " + empresa);
 			// só é possível manifestar no máximo 20 eventos por lote
 			List<String> lotes = new LinkedList<>();
 
@@ -266,6 +263,8 @@ public class NFeServiceBean implements NFeService {
 			List<Future<String>> tasks = new ArrayList<>();
 			for (String lote : lotes) {
 
+				debug("despachou o lote " + lote + tenant + ", " + contrato + ", " + empresa);
+
 				// assina o lote antes de enviar
 				String eventoXMLAssinado = assinarEnvioEvento(lote, empresa.getCertificado());
 				Callable<String> task = new ProcessadorEventoNotificacao(eventoXMLAssinado, ambiente, empresa.getCertificado());
@@ -276,7 +275,14 @@ public class NFeServiceBean implements NFeService {
 
 			// recupera o retorno de processamento das tasks (notificações da sefaz)
 			for (Future<String> future : tasks) {
+
+				debug("solicitando resultado do processamento do lote " + tenant + ", " + contrato + ", " + empresa);
+
 				String encoded = future.get();
+
+				debug("resultado do (get) " + tenant + ", " + contrato + ", " + empresa);
+
+				debug("retorno de lotes " + encoded);
 
 				com.dgreentec.domain.xsd.retEnvEvento_v100.ObjectFactory of = new com.dgreentec.domain.xsd.retEnvEvento_v100.ObjectFactory();
 				Unmarshaller unmarshaller = javax.xml.bind.JAXBContext.newInstance(of.getClass()).createUnmarshaller();
@@ -302,6 +308,8 @@ public class NFeServiceBean implements NFeService {
 						log.setxEvento(infEvento.getXEvento());
 						log.setxMotivo(infEvento.getXMotivo());
 
+						debug("adicionando log de notificaçnao " + tenant + " " + log);
+
 						logEventoNotificacaoService.adicionarLogEventoNotificacao(tenant, log);
 
 						String cStat = infEvento.getCStat();
@@ -313,8 +321,9 @@ public class NFeServiceBean implements NFeService {
 							break;
 						}
 						case ConstantesNFe.RETORNO_EVENTO_REGISTRADO_NAO_VINCULADO_NFE:
-						case ConstantesNFe.RETORNO_EVENTO_REGISTRADO_VINCULADO_NFE:
-
+						case ConstantesNFe.RETORNO_EVENTO_REGISTRADO_VINCULADO_NFE: {
+							break;
+						}
 						default:
 							logger.error("Falha no processamento do evento id: " + infEvento.getId() + ", chave: " + infEvento.getChNFe()
 									+ ", protocolo: " + infEvento.getNProt() + ", seqEvento: " + infEvento.getNSeqEvento() + " tipo: "

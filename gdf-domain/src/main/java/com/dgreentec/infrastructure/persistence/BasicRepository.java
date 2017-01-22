@@ -5,21 +5,15 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.persistence.EntityGraph;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.FlushModeType;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceUnit;
 import javax.persistence.Query;
 import javax.persistence.StoredProcedureQuery;
-import javax.persistence.SynchronizationType;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaDelete;
 import javax.persistence.criteria.CriteriaUpdate;
@@ -46,22 +40,6 @@ public abstract class BasicRepository {
 	//	@PersistenceContext(synchronization = SynchronizationType.UNSYNCHRONIZED)
 	@Inject
 	protected Instance<EntityManager> unManagedEntityManager;
-
-	@PersistenceUnit
-	protected EntityManagerFactory factory;
-
-	@RequestScoped
-	@Produces
-	@RepositoryEntityManager
-	public EntityManager createEntityManager() {
-		return factory.createEntityManager();
-	}
-
-	public void closeEntityManager(@Disposes @RepositoryEntityManager EntityManager manager) {
-		if (manager.isOpen()) {
-			manager.close();
-		}
-	}
 
 	protected Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -227,13 +205,5 @@ public abstract class BasicRepository {
 
 	public void setUnManagedEntityManager(EntityManager unManagedEntityManager) {
 		throw new IllegalArgumentException("CANNOT SET unmanagedENTITYMANAGER");
-	}
-
-	public EntityManagerFactory getFactory() {
-		return factory;
-	}
-
-	public void setFactory(EntityManagerFactory factory) {
-		this.factory = factory;
 	}
 }

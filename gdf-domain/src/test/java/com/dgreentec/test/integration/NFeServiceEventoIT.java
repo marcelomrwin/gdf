@@ -29,10 +29,11 @@ import org.junit.runner.RunWith;
 
 import com.dgreentec.AbstractTestCase;
 import com.dgreentec.IntegrationTest;
+import com.dgreentec.TestCasePrinterRule;
 import com.dgreentec.domain.boundary.api.ContratoService;
 import com.dgreentec.domain.boundary.api.NFeService;
 import com.dgreentec.domain.boundary.api.TenantService;
-import com.dgreentec.domain.boundary.impl.NFeServiceBean;
+import com.dgreentec.domain.boundary.impl.NFeServiceBoundary;
 import com.dgreentec.domain.model.Contrato;
 import com.dgreentec.domain.model.EventoDocumento;
 import com.dgreentec.domain.model.Tenant;
@@ -62,9 +63,6 @@ public class NFeServiceEventoIT extends AbstractTestCase {
 	public static Archive<?> createDeployment() {
 		WebArchive deploy = getWebDeploy(DATABASE.POSTGRES_DESENV_NO_DROP, true);
 
-		deploy.addPackages(true, Contrato.class.getPackage(), ContratoRepository.class.getPackage(), NFeService.class.getPackage(),
-				NFeServiceBean.class.getPackage(), XSDObject.class.getPackage());
-
 		deploy.as(ZipExporter.class).exportTo(new File("/tmp/arquillian_web.war"), true);
 		return deploy;
 	}
@@ -72,37 +70,40 @@ public class NFeServiceEventoIT extends AbstractTestCase {
 	@Test
 	@InSequence(1)
 	public void consultarEventosDoContrato() throws NfeException, InterruptedException, ExecutionException, IOException {
-		TipoAmbienteEnum ambiente = TipoAmbienteEnum.HOMOLOGACAO;
-		Tenant rioPolem = tenantService.consultarTenantPorIdTenant(1L);
-		Contrato contratoRioPolem = contratoService.consultarContratoPorIdContrato(rioPolem, 1L);
-		assertThat(contratoRioPolem, is(not(nullValue())));
-		assertThat(contratoRioPolem.getEmpresas(), is(not(Matchers.empty())));
+				TipoAmbienteEnum ambiente = TipoAmbienteEnum.HOMOLOGACAO;
+				Tenant rioPolem = tenantService.consultarTenantPorIdTenant(1L);
+				assertThat(rioPolem, is(not(nullValue())));
+				Contrato contratoRioPolem = contratoService.consultarContratoPorIdContrato(rioPolem, 1L);
+				assertThat(contratoRioPolem, is(not(nullValue())));
+				assertThat(contratoRioPolem.getEmpresas(), is(not(Matchers.empty())));
 
-		Tenant ddx = tenantService.consultarTenantPorIdTenant(2L);
-		Contrato contratoDDX = contratoService.consultarContratoPorIdContrato(ddx, 1L);
-		assertThat(contratoDDX, is(not(nullValue())));
-		assertThat(contratoDDX.getEmpresas(), is(not(Matchers.empty())));
+				Tenant ddx = tenantService.consultarTenantPorIdTenant(2L);
+				Contrato contratoDDX = contratoService.consultarContratoPorIdContrato(ddx, 1L);
+				assertThat(contratoDDX, is(not(nullValue())));
+				assertThat(contratoDDX.getEmpresas(), is(not(Matchers.empty())));
 
-		nfeService.processarEventosPorContrato(rioPolem, contratoRioPolem, ambiente);
-		nfeService.processarEventosPorContrato(ddx, contratoDDX, ambiente);
+				nfeService.processarEventosPorContrato(rioPolem, contratoRioPolem, ambiente);
+				nfeService.processarEventosPorContrato(ddx, contratoDDX, ambiente);
 
 		//como o serviço é todo assincrono é preciso forçar um sleep
-		Calendar c = Calendar.getInstance();
-		c.add(Calendar.MILLISECOND, 5);
-		Date future = c.getTime();
-		int wait = 15;
-		do {
-			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-			long startTime = System.currentTimeMillis();
-			while ((System.currentTimeMillis() - startTime) < wait * 1000 && !in.ready()) {
-			}
-			if (in.ready()) {
-				//se digitar algo no console sai do loop
-				String line = in.readLine();
-				System.out.println("Entered " + line);
-				break;
-			}
-		} while (new Date().before(future));
-		System.out.println("Fim do método");
+		//		Calendar c = Calendar.getInstance();
+		//		c.add(Calendar.MILLISECOND, 5);
+		//		Date future = c.getTime();
+		//		int wait = 15;
+		//		do {
+		//			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		//			long startTime = System.currentTimeMillis();
+		//			while ((System.currentTimeMillis() - startTime) < wait * 1000 && !in.ready()) {
+		//			}
+		//			if (in.ready()) {
+		//				//se digitar algo no console sai do loop
+		//				String line = in.readLine();
+		//				System.out.println("Entered " + line);
+		//				break;
+		//			}
+		//		} while (new Date().before(future));
+		//		System.out.println("Fim do método");
+
+		TimeUnit.SECONDS.sleep(60);
 	}
 }

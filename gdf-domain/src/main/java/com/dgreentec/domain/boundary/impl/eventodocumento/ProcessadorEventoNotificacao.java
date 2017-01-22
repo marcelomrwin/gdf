@@ -1,4 +1,4 @@
-package com.dgreentec.domain.boundary.impl;
+package com.dgreentec.domain.boundary.impl.eventodocumento;
 
 import java.io.File;
 import java.io.InputStream;
@@ -41,10 +41,6 @@ public class ProcessadorEventoNotificacao implements Callable<String> {
 
 	@Override
 	public String call() throws Exception {
-
-		//debug
-		System.out.println(lote);
-		//end debug
 
 		OMElement ome = AXIOMUtil.stringToOM(lote);
 		NfeDadosMsg dados = new NfeDadosMsg();

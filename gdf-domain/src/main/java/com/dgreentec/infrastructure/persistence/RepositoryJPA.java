@@ -135,5 +135,4 @@ public interface RepositoryJPA extends Serializable {
 
 	public void setEntityManager(EntityManager entityManager);
 
-	public void setFactory(EntityManagerFactory factory);
 }

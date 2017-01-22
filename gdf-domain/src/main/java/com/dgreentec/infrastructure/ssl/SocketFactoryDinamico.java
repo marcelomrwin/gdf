@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 
 import javax.net.SocketFactory;
 import javax.net.ssl.KeyManager;
@@ -31,16 +32,23 @@ public class SocketFactoryDinamico implements ProtocolSocketFactory {
 	private static final Logger LOG = LoggerFactory.getLogger(SocketFactoryDinamico.class);
 
 	private SSLContext ssl = null;
+
 	private final ThreadLocalCert thread;
+
 	private final KeyStore trustStore;
 
-	public SocketFactoryDinamico(X509Certificate certificate, PrivateKey privateKey,KeyStore trustStore) {
+	public SocketFactoryDinamico(X509Certificate certificate, PrivateKey privateKey, KeyStore trustStore) {
 		this.thread = new ThreadLocalCert(new HSKeyManager(certificate, privateKey));
 		this.trustStore = trustStore;
+
+		debug(getClass().getName()+" criado com a thread "+thread.getKeyManager());
 	}
 
 	private SSLContext createSSLContext() {
 		try {
+
+			debug("criando ssl context " + thread.getKeyManager());
+
 			KeyManager[] keyManagers = createKeyManagers();
 			TrustManager[] trustManagers = createTrustManagers();
 			SSLContext sslContext = SSLContext.getInstance("TLSv1");
@@ -63,6 +71,9 @@ public class SocketFactoryDinamico implements ProtocolSocketFactory {
 	@Override
 	public Socket createSocket(String host, int port, InetAddress localAddress, int localPort, HttpConnectionParams params)
 			throws IOException, UnknownHostException, ConnectTimeoutException {
+
+		debug("criando socket " + thread.getKeyManager());
+
 		if (params == null) {
 			throw new IllegalArgumentException("Parameters may not be null");
 		}
@@ -118,6 +129,11 @@ public class SocketFactoryDinamico implements ProtocolSocketFactory {
 		trustManagerFactory.init(trustStore);
 
 		return trustManagerFactory.getTrustManagers();
+	}
+
+	protected void debug(String text) {
+		System.out.println("** DEBUG BEGIN ** |" + getClass().getName() + ":" + Thread.currentThread().getStackTrace()[2].getLineNumber()
+				+ " | " + new Date() + " | " + text + "| ** DEBUG END **");
 	}
 
 }

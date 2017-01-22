@@ -1,8 +1,7 @@
-package com.dgreentec.domain.boundary.impl;
+package com.dgreentec.domain.boundary.impl.eventodocumento;
 
 import java.io.File;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -13,8 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import javax.enterprise.inject.spi.InjectionPoint;
-import javax.inject.Inject;
 import javax.xml.bind.Unmarshaller;
 
 import org.apache.axiom.om.OMElement;
@@ -23,10 +20,9 @@ import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.dgreentec.domain.boundary.api.ContratoService;
 import com.dgreentec.domain.boundary.api.EmpresaService;
-import com.dgreentec.domain.boundary.api.TenantService;
 import com.dgreentec.domain.model.BloqueioSefaz;
 import com.dgreentec.domain.model.Empresa;
 import com.dgreentec.domain.model.EventoDocumento;
@@ -51,7 +47,6 @@ import com.dgreentec.infrastructure.configuration.nfe.WebServices;
 import com.dgreentec.infrastructure.model.ConstantesNFe;
 import com.dgreentec.infrastructure.model.SchemaEnum;
 import com.dgreentec.infrastructure.ssl.SocketFactoryDinamico;
-import com.dgreentec.infrastructure.util.CDIUtils;
 import com.dgreentec.infrastructure.util.GzipUtils;
 import com.dgreentec.infrastructure.util.JaxbUtils;
 import com.dgreentec.infrastructure.util.NFeDateUtils;
@@ -62,42 +57,19 @@ import br.inf.portalfiscal.www.nfe.wsdl.nfedistribuicaodfe.NFeDistribuicaoDFeStu
 import br.inf.portalfiscal.www.nfe.wsdl.nfedistribuicaodfe.NFeDistribuicaoDFeStub.NfeDistDFeInteresseResponse;
 import br.inf.portalfiscal.www.nfe.wsdl.nfedistribuicaodfe.NFeDistribuicaoDFeStub.NfeDistDFeInteresseResult_type0;
 
-@ProcessadorEventoDocumento
 public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumentoResponse> {
 
-	@Inject
-	protected Logger logger;
-
-	@Inject
-	protected EmpresaService empresaService;
-
-	@Inject
-	public ProcessadorEventoDocumentoEmpresa(InjectionPoint ip) {
-		configureValues(ip);
+	public ProcessadorEventoDocumentoEmpresa(EmpresaService empresaService, Empresa empresa, Tenant tenant, TipoAmbienteEnum ambiente) {
+		super();
+		this.empresaService = empresaService;
+		this.empresa = empresa;
+		this.tenant = tenant;
+		this.ambiente = ambiente;
 	}
 
-	private void configureValues(InjectionPoint ip) {
-		ProcessadorEventoDocumento evento = null;
-		for (Annotation annotation : ip.getQualifiers()) {
-			if (annotation.annotationType().equals(ProcessadorEventoDocumento.class)) {
-				evento = (ProcessadorEventoDocumento) annotation;
-				break;
-			}
-		}
+	protected Logger logger = LoggerFactory.getLogger(getClass());
 
-		if (evento != null) {
-			long idTenant = evento.idTenant();
-			String cnpj = evento.cnpj();
-			ambiente = evento.ambiente();
-			TenantService tenantService = CDIUtils.getInstance().getBeanInstance(TenantService.class);
-			tenant = tenantService.consultarTenantPorIdTenant(idTenant);
-			ContratoService contratoService = CDIUtils.getInstance().getBeanInstance(ContratoService.class);
-			EmpresaService empresaService = CDIUtils.getInstance().getBeanInstance(EmpresaService.class);
-
-			empresa = empresaService.consultarEmpresaPorCnpj(tenant, cnpj);
-		} else
-			throw new IllegalStateException("No @ProcessadorEventoDocumento on InjectionPoint");
-	}
+	private EmpresaService empresaService;
 
 	private Empresa empresa;
 
@@ -105,17 +77,49 @@ public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumen
 
 	private TipoAmbienteEnum ambiente;
 
+	//	@Inject
+	//	public ProcessadorEventoDocumentoEmpresa(InjectionPoint ip) {
+	//		configureValues(ip);
+	//	}
+
+	//	private void configureValues(InjectionPoint ip) {
+	//		ProcessadorEventoDocumento evento = null;
+	//		for (Annotation annotation : ip.getQualifiers()) {
+	//			if (annotation.annotationType().equals(ProcessadorEventoDocumento.class)) {
+	//				evento = (ProcessadorEventoDocumento) annotation;
+	//				break;
+	//			}
+	//		}
+	//
+	//		if (evento != null) {
+	//			long idTenant = evento.idTenant();
+	//			cnpj = evento.cnpj();
+	//			ambiente = evento.ambiente();
+	//			TenantService tenantService = CDIUtils.getInstance().getBeanInstance(TenantService.class);
+	//			tenant = tenantService.consultarTenantPorIdTenant(idTenant);
+	//
+	//		} else
+	//			throw new IllegalStateException("No @ProcessadorEventoDocumento on InjectionPoint");
+	//	}
+
 	@Override
 	public EventoDocumentoResponse call() throws Exception {
 		return consultarEventosDaEmpresa();
 	}
 
 	private EventoDocumentoResponse consultarEventosDaEmpresa() throws Exception {
+
+		debug("empresa retornada para o tenant " + tenant + " [" + empresa + "]");
+
+		debug("Iniciou o tratamento para a empresa " + empresa + " do tenant " + tenant);
+
 		EventoDocumentoResponse response = new EventoDocumentoResponse();
 		List<EventoDocumento> lista = new LinkedList<>();
 		response.setEventos(lista);
 		// Antes de realizar qualquer ação verifica se existe bloqueio pra empresa na sefaz
 		if (!empresa.existeBloqueioParaEvento()) {
+
+			debug("não existe bloqueio para a empresa " + empresa);
 
 			DistDFeInt dist = new ObjectFactory().createDistDFeInt();
 			dist.setVersao("1.00");// FIXME verificar se é possível parametrizar e se vale a pena já que quando uma
@@ -138,11 +142,15 @@ public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumen
 			NfeDistDFeInteresse distDFeInteresse = new NfeDistDFeInteresse();
 			distDFeInteresse.setNfeDadosMsg(dadosMsg);
 
+			debug("invocando sefaz " + tenant + "|" + empresa);
+
 			com.dgreentec.domain.xsd.retDistDFeInt_v101.RetDistDFeInt retorno = callService(dist, distDFeInteresse, ambiente,
 					empresa.getCertificado().getX509Certificate(), empresa.getCertificado().getPrivateKey());
 
 			response.setMaxNSu(retorno.getMaxNSU());
 			response.setUltimoNSu(retorno.getUltNSU());
+
+			debug("retorno sefaz " + tenant + "|" + empresa);
 
 			if (retorno.getCStat().equalsIgnoreCase(ConstantesNFe.RETORNO_EVENTO_MANIFESTO_138)) {
 				empresa = empresaService.consultarEmpresaPorCnpj(tenant, empresa.getCnpj());
@@ -156,6 +164,8 @@ public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumen
 
 				List<DocZip> docZip = loteDistDFeInt.getDocZips();
 				// o conteudo do arquivo vem zipado, é preciso descompactar com gzip
+
+				debug("processando docZip " + tenant + "|" + empresa + "[" + docZip.size() + "]");
 
 				for (DocZip dzip : docZip) {
 					SchemaEnum schema = SchemaEnum.fromSchemaName(dzip.getSchema());
@@ -242,23 +252,45 @@ public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumen
 	private com.dgreentec.domain.xsd.retDistDFeInt_v101.RetDistDFeInt callService(DistDFeInt dist, NfeDistDFeInteresse distDFeInteresse,
 			TipoAmbienteEnum ambiente, X509Certificate certificate, PrivateKey privateKey) throws Exception {
 
-		com.dgreentec.domain.xsd.retDistDFeInt_v101.RetDistDFeInt retorno = null;
-		do {
-			NfeDistDFeInteresseResponse result = getResult(distDFeInteresse, ambiente, certificate, privateKey);
+		com.dgreentec.domain.xsd.retDistDFeInt_v101.RetDistDFeInt retorno;
+		try {
+			retorno = null;
+			int maxCount = 0;
+			do {
 
-			NfeDistDFeInteresseResult_type0 nfeDistDFeInteresseResult = result.getNfeDistDFeInteresseResult();
-			OMElement extraElement = nfeDistDFeInteresseResult.getExtraElement();
-			String encoded = extraElement.toString();
-			Unmarshaller unmarshaller = javax.xml.bind.JAXBContext
-					.newInstance(new com.dgreentec.domain.xsd.retDistDFeInt_v101.ObjectFactory().getClass()).createUnmarshaller();
-			retorno = (RetDistDFeInt) (unmarshaller.unmarshal(new java.io.StringReader(encoded)));
-		} while (retorno == null || retorno.getCStat().equalsIgnoreCase(ConstantesNFe.REJEICAO_593));
+				debug("preparando chamada na sefaz");
+
+				NfeDistDFeInteresseResponse result = getResult(distDFeInteresse, ambiente, certificate, privateKey);
+
+				NfeDistDFeInteresseResult_type0 nfeDistDFeInteresseResult = result.getNfeDistDFeInteresseResult();
+				OMElement extraElement = nfeDistDFeInteresseResult.getExtraElement();
+				String encoded = extraElement.toString();
+				Unmarshaller unmarshaller = javax.xml.bind.JAXBContext
+						.newInstance(new com.dgreentec.domain.xsd.retDistDFeInt_v101.ObjectFactory().getClass()).createUnmarshaller();
+				retorno = (RetDistDFeInt) (unmarshaller.unmarshal(new java.io.StringReader(encoded)));
+
+				debug("retorno da sefaz " + retorno + " - " + retorno != null ? retorno.getCStat() + retorno.getXMotivo() : "");
+				maxCount++;
+				if (maxCount > 3)
+					break;
+			} while (retorno == null || retorno.getCStat().equalsIgnoreCase(ConstantesNFe.REJEICAO_593));
+
+			if (retorno.getCStat().equalsIgnoreCase(ConstantesNFe.REJEICAO_593))
+				throw new Exception("ERRO no retorno chamada da sefaz 593");
+
+		} catch (Exception e) {
+			debug("ERRO " + e.getMessage());
+			logger.error("Falha ao consultar retorno do processamento do lote", e);
+			throw e;
+		}
 
 		return retorno;
 	}
 
 	private NfeDistDFeInteresseResponse getResult(NfeDistDFeInteresse distDFeInteresse, TipoAmbienteEnum ambiente,
 			X509Certificate certificate, PrivateKey privateKey) throws Exception {
+
+		debug("configurando certificado digital " + certificate.getSubjectDN());
 
 		KeyStore trustStore = KeyStore.getInstance("JKS");
 
@@ -272,6 +304,8 @@ public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumen
 		Protocol protocol = new Protocol("https", socketFactoryDinamico, 443);
 		Protocol.registerProtocol("https", protocol);
 
+		debug("certificado digital configurado");
+
 		NFeDistribuicaoDFeStub stub = new NFeDistribuicaoDFeStub(
 				WebServices.getInstanceConfig().getServico(UFEnum.AN, TipoServicoEnum.NFeDistribuicaoDFe, ambiente).getUrl());
 		NfeDistDFeInteresseResponse result = stub.nfeDistDFeInteresse(distDFeInteresse);
@@ -279,6 +313,11 @@ public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumen
 
 		return result;
 
+	}
+
+	protected void debug(String text) {
+		System.out.println("** DEBUG BEGIN ** |" + getClass().getName() + ":" + Thread.currentThread().getStackTrace()[2].getLineNumber()
+				+ " | " + new Date() + " | " + text + "| ** DEBUG END **");
 	}
 
 }

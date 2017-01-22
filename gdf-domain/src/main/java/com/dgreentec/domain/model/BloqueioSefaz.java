@@ -51,4 +51,64 @@ public class BloqueioSefaz implements Serializable {
 		this.textoBloqueio = textoBloqueio;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((dtCadastroBloqueio == null) ? 0 : dtCadastroBloqueio.hashCode());
+		result = prime * result + ((dtExpiracao == null) ? 0 : dtExpiracao.hashCode());
+		result = prime * result + ((textoBloqueio == null) ? 0 : textoBloqueio.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof BloqueioSefaz)) {
+			return false;
+		}
+		BloqueioSefaz other = (BloqueioSefaz) obj;
+		if (dtCadastroBloqueio == null) {
+			if (other.dtCadastroBloqueio != null) {
+				return false;
+			}
+		} else if (!dtCadastroBloqueio.equals(other.dtCadastroBloqueio)) {
+			return false;
+		}
+		if (dtExpiracao == null) {
+			if (other.dtExpiracao != null) {
+				return false;
+			}
+		} else if (!dtExpiracao.equals(other.dtExpiracao)) {
+			return false;
+		}
+		if (textoBloqueio == null) {
+			if (other.textoBloqueio != null) {
+				return false;
+			}
+		} else if (!textoBloqueio.equals(other.textoBloqueio)) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("BloqueioSefaz [");
+		if (dtExpiracao != null)
+			builder.append("dtExpiracao=").append(dtExpiracao).append(", ");
+		if (dtCadastroBloqueio != null)
+			builder.append("dtCadastroBloqueio=").append(dtCadastroBloqueio).append(", ");
+		if (textoBloqueio != null)
+			builder.append("textoBloqueio=").append(textoBloqueio);
+		builder.append("]");
+		return builder.toString();
+	}
+
 }

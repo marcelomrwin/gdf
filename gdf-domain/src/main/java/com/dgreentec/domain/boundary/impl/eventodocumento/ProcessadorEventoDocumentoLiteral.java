@@ -1,4 +1,4 @@
-package com.dgreentec.domain.boundary.impl;
+package com.dgreentec.domain.boundary.impl.eventodocumento;
 
 import javax.enterprise.util.AnnotationLiteral;
 

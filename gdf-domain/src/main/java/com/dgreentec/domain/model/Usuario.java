@@ -9,6 +9,7 @@ import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -32,15 +33,15 @@ public class Usuario extends AbstractEntityVersion {
 
 	@Id
 	@CPF
-	@Column(name = "NUM_CPF", updatable = false)
+	@Column(name = "NUM_CPF", updatable = false, length = 11)
 	private String cpf;
 
 	@NotEmpty
-	@Column(name = "TXT_NOME", nullable = false)
+	@Column(name = "TXT_NOME", nullable = false, length = 250)
 	private String nome;
 
 	@ManyToMany(targetEntity = Tenant.class, cascade = CascadeType.REFRESH)
-	@JoinTable(name = "T_USUARIO_TENANT", joinColumns = @JoinColumn(name = "NUM_CPF"), inverseJoinColumns = @JoinColumn(name = "ID_TENANT"))
+	@JoinTable(name = "T_USUARIO_TENANT", schema = "comum", joinColumns = @JoinColumn(name = "NUM_CPF", foreignKey = @ForeignKey(name = "FK_USUARIO_TENANT")), inverseJoinColumns = @JoinColumn(name = "ID_TENANT", foreignKey = @ForeignKey(name = "FK_TENANT_USUARIO")))
 	@OrderBy("nomeTenant")
 	@Size(min = 1, message = "Usuário deve estar associado a pelo menos um Tenant")
 	private SortedSet<Tenant> tenants = new TreeSet<>();

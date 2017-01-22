@@ -47,4 +47,14 @@ public class HSKeyManager implements X509KeyManager {
 	public String[] getServerAliases(String arg0, Principal[] arg1) {
 		return null;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("HSKeyManager [");
+		if (certificate != null)
+			builder.append("certificate=").append(certificate.getSubjectDN()).append(", ");
+		builder.append("]");
+		return builder.toString();
+	}
 }

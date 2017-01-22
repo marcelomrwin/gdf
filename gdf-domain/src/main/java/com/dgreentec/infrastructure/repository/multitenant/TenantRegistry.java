@@ -1,5 +1,6 @@
 package com.dgreentec.infrastructure.repository.multitenant;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,6 +17,7 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -49,7 +51,8 @@ public class TenantRegistry {
 
 	private final Map<String, EntityManagerFactory> entityManagerFactories = new HashMap<>();
 
-	private static final Logger logger = LoggerFactory.getLogger(TenantRegistry.class);
+	@Inject
+	private Logger logger;
 
 	@PostConstruct
 	protected void startupTenants() {
@@ -136,11 +139,14 @@ public class TenantRegistry {
 		if (tenantSchemaName == null)
 			return null;
 		EntityManagerFactory factory = entityManagerFactories.get(tenantSchemaName);
-		//		if (factory == null)
-		//			factory = doCreateEntityManagerFactory(tenantSchemaName);
-		//
-		//		entityManagerFactories.put(tenantSchemaName, factory);
+
+		debug("return entityManagerFactory for tenant " + tenantSchemaName);
 
 		return factory;
+	}
+
+	protected void debug(String text) {
+		System.out.println("** DEBUG BEGIN ** |" + getClass().getName() + ":" + Thread.currentThread().getStackTrace()[2].getLineNumber()
+				+ " | " + new Date() + " | " + text + "| ** DEBUG END **");
 	}
 }

@@ -7,6 +7,8 @@ import java.util.Date;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
+import com.dgreentec.domain.model.EventoNSU;
+import com.dgreentec.domain.model.EventoNSU_;
 import com.dgreentec.domain.model.LogEventoNotificacao;
 import com.dgreentec.domain.model.LogEventoNotificacao_;
 import com.dgreentec.domain.model.LoteEvento;
@@ -25,11 +27,11 @@ public class CrudGen extends AbstractCrudGen {
 
 		System.out.println(new Date() + " - begin");
 		// Classe do modelo que será usada para gerar artefatos
-		Class<? extends AbstractEntityVersion> clazz = Usuario.class;
+		Class<? extends AbstractEntityVersion> clazz = EventoNSU.class;
 		try {
 			prepare();
 			// gera as classes e filtro para os campos abaixo
-			generate(clazz, Usuario_.CPF, Usuario_.NOME);
+			generate(clazz, EventoNSU_.IDEVENTONSU, EventoNSU_.DTNSU, EventoNSU_.SCHEMA, EventoNSU_.IDNSU);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

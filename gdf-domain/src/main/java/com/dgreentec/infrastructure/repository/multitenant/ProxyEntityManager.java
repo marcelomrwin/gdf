@@ -74,7 +74,6 @@ public class ProxyEntityManager {
 	}
 
 	protected void debug(String text) {
-		System.out.println("** DEBUG BEGIN ** |" + getClass().getName() + ":" + Thread.currentThread().getStackTrace()[2].getLineNumber()
-				+ " | " + new Date() + " | " + text + "| ** DEBUG END **");
+//		System.out.println("** DEBUG BEGIN ** |" + getClass().getName() + ":" + Thread.currentThread().getStackTrace()[2].getLineNumber()	+ " | " + new Date() + " | " + text + "| ** DEBUG END **");
 	}
 }

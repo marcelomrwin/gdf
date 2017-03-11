@@ -5,7 +5,7 @@
 	<persistence-unit name="gdf-pu">
 		<provider>org.hibernate.ejb.HibernatePersistence</provider>
 		<jta-data-source>java:jboss/datasources/testGDFPostgreDS</jta-data-source>
-		<class>com.dgreentec.domain.model.BloqueioSefaz</class>
+		<class>com.dgreentec.domain.model.AgendamentoSefaz</class>
 		<class>com.dgreentec.domain.model.Certificado</class>
 		<class>com.dgreentec.domain.model.Contrato</class>
 		<class>com.dgreentec.domain.model.DocumentoFiscal</class>

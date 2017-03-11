@@ -86,24 +86,24 @@ public class NFeServiceEventoIT extends AbstractTestCase {
 				nfeService.processarEventosPorContrato(ddx, contratoDDX, ambiente);
 
 		//como o serviço é todo assincrono é preciso forçar um sleep
-		//		Calendar c = Calendar.getInstance();
-		//		c.add(Calendar.MILLISECOND, 5);
-		//		Date future = c.getTime();
-		//		int wait = 15;
-		//		do {
-		//			BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-		//			long startTime = System.currentTimeMillis();
-		//			while ((System.currentTimeMillis() - startTime) < wait * 1000 && !in.ready()) {
-		//			}
-		//			if (in.ready()) {
-		//				//se digitar algo no console sai do loop
-		//				String line = in.readLine();
-		//				System.out.println("Entered " + line);
-		//				break;
-		//			}
-		//		} while (new Date().before(future));
-		//		System.out.println("Fim do método");
+//				Calendar c = Calendar.getInstance();
+//				c.add(Calendar.MINUTE, 5);
+//				Date future = c.getTime();
+//				int wait = 15;
+//				do {
+//					BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+//					long startTime = System.currentTimeMillis();
+//					while ((System.currentTimeMillis() - startTime) < wait * 1000 && !in.ready()) {
+//					}
+//					if (in.ready()) {
+//						//se digitar algo no console sai do loop
+//						String line = in.readLine();
+//						System.out.println("Entered " + line);
+//						break;
+//					}
+//				} while (new Date().before(future));
+//				System.out.println("Fim do método");
 
-		TimeUnit.SECONDS.sleep(60);
+		TimeUnit.SECONDS.sleep(90);
 	}
 }

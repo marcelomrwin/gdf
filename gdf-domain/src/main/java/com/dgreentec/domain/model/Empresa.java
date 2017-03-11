@@ -1,8 +1,9 @@
 package com.dgreentec.domain.model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
@@ -45,6 +46,7 @@ public class Empresa extends AbstractEntityVersion {
 
 	@ManyToOne
 	@NotNull(message = "Empresa deve possuir um contrato obrigatoriamente")
+	@JoinColumn(name = "COD_CONTRATO", foreignKey = @ForeignKey(name = "FK_COD_CONTRATO"))
 	private Contrato contrato;
 
 	@NotNull
@@ -53,23 +55,46 @@ public class Empresa extends AbstractEntityVersion {
 	private UFEnum uf;
 
 	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "COD_CERTIFICADO", foreignKey = @ForeignKey(name = "FK_CERTIFICADO"))
 	private Certificado certificado;
 
 	@Embedded
 	private UltimoEventoNSU ultimoNSU;
 
-	@Embedded
-	private BloqueioSefaz bloqueioSefaz;
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "COD_AGENDAMENTO_SEFAZ", foreignKey = @ForeignKey(name = "FK_AGENDAMENTO"))
+	private AgendamentoSefaz agendamentoSefaz = new AgendamentoSefaz();
 
 	@OneToMany(cascade = CascadeType.ALL)
 	@JoinColumn(name = "COD_CNPJ", foreignKey = @ForeignKey(name = "FK_EMPRESA_NSU"))
 	private List<EventoNSU> nsus = new ArrayList<>();
 
-	public boolean existeBloqueioParaEvento() {
-		if (bloqueioSefaz != null) {
-			return bloqueioSefaz.getDtExpiracao().before(new Date());
+	public boolean executarEventoManifesto() {
+		return (agendamentoSefaz.getProximaExecucao().isBefore(LocalDateTime.now())
+				|| agendamentoSefaz.getProximaExecucao().isEqual(LocalDateTime.now()));
+	}
+
+	public void agendarEventoSefaz(TimeUnit unit, long value) {
+		this.agendamentoSefaz.setEmExecucao(false);
+		LocalDateTime next = LocalDateTime.now();
+		switch (unit) {
+		case SECONDS: {
+			next = next.plusSeconds(value);
+			break;
 		}
-		return false;
+		case MINUTES: {
+			next = next.plusMinutes(value);
+			break;
+		}
+		case HOURS: {
+			next = next.plusHours(value);
+			break;
+		}
+		default:
+			throw new RuntimeException("Não é possível agendar para a unidade " + unit);
+		}
+
+		this.agendamentoSefaz.setProximaExecucao(next);
 	}
 
 	public void adicionarNSU(EventoNSU evento) {
@@ -163,14 +188,11 @@ public class Empresa extends AbstractEntityVersion {
 			return this;
 		}
 
-	}
+		public Builder comAgendamento(AgendamentoSefaz pAgendamento) {
+			this.entity.setAgendamentoSefaz(pAgendamento);
+			return this;
+		}
 
-	public BloqueioSefaz getBloqueioSefaz() {
-		return bloqueioSefaz;
-	}
-
-	public void setBloqueioSefaz(BloqueioSefaz bloqueioSefaz) {
-		this.bloqueioSefaz = bloqueioSefaz;
 	}
 
 	public List<EventoNSU> getNsus() {
@@ -185,7 +207,7 @@ public class Empresa extends AbstractEntityVersion {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((bloqueioSefaz == null) ? 0 : bloqueioSefaz.hashCode());
+		result = prime * result + ((agendamentoSefaz == null) ? 0 : agendamentoSefaz.hashCode());
 		result = prime * result + ((certificado == null) ? 0 : certificado.hashCode());
 		result = prime * result + ((cnpj == null) ? 0 : cnpj.hashCode());
 		result = prime * result + ((contrato == null) ? 0 : contrato.hashCode());
@@ -208,11 +230,11 @@ public class Empresa extends AbstractEntityVersion {
 			return false;
 		}
 		Empresa other = (Empresa) obj;
-		if (bloqueioSefaz == null) {
-			if (other.bloqueioSefaz != null) {
+		if (agendamentoSefaz == null) {
+			if (other.agendamentoSefaz != null) {
 				return false;
 			}
-		} else if (!bloqueioSefaz.equals(other.bloqueioSefaz)) {
+		} else if (!agendamentoSefaz.equals(other.agendamentoSefaz)) {
 			return false;
 		}
 		if (certificado == null) {
@@ -280,12 +302,22 @@ public class Empresa extends AbstractEntityVersion {
 			builder2.append("certificado=").append(certificado).append(", ");
 		if (ultimoNSU != null)
 			builder2.append("ultimoNSU=").append(ultimoNSU).append(", ");
-		if (bloqueioSefaz != null)
-			builder2.append("bloqueioSefaz=").append(bloqueioSefaz).append(", ");
+		if (agendamentoSefaz != null)
+			builder2.append("agendamentoSefaz=").append(agendamentoSefaz).append(", ");
 		if (nsus != null)
-			builder2.append("nsus=").append(nsus.subList(0, Math.min(nsus.size(), maxLen)));
+			builder2.append("nsus=").append(nsus.subList(0, Math.min(nsus.size(), maxLen))).append(", ");
+		if (version != null)
+			builder2.append("version=").append(version);
 		builder2.append("]");
 		return builder2.toString();
+	}
+
+	public AgendamentoSefaz getAgendamentoSefaz() {
+		return agendamentoSefaz;
+	}
+
+	public void setAgendamentoSefaz(AgendamentoSefaz agendamentoSefaz) {
+		this.agendamentoSefaz = agendamentoSefaz;
 	}
 
 }

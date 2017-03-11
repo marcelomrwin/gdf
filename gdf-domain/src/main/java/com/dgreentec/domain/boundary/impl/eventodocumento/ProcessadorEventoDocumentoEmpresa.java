@@ -2,12 +2,13 @@ package com.dgreentec.domain.boundary.impl.eventodocumento;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -23,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.dgreentec.domain.boundary.api.EmpresaService;
-import com.dgreentec.domain.model.BloqueioSefaz;
+import com.dgreentec.domain.model.AgendamentoSefaz;
 import com.dgreentec.domain.model.Empresa;
 import com.dgreentec.domain.model.EventoDocumento;
 import com.dgreentec.domain.model.EventoDocumentoResponse;
@@ -84,144 +85,163 @@ public class ProcessadorEventoDocumentoEmpresa implements Callable<EventoDocumen
 
 	private EventoDocumentoResponse consultarEventosDaEmpresa() throws Exception {
 
-		debug("empresa retornada para o tenant " + tenant + " [" + empresa + "]");
+		try {
+			debug("Iniciou o tratamento para a empresa " + empresa + " do tenant " + tenant);
 
-		debug("Iniciou o tratamento para a empresa " + empresa + " do tenant " + tenant);
+			EventoDocumentoResponse response = new EventoDocumentoResponse();
+			List<EventoDocumento> lista = new LinkedList<>();
+			response.setEventos(lista);
 
-		EventoDocumentoResponse response = new EventoDocumentoResponse();
-		List<EventoDocumento> lista = new LinkedList<>();
-		response.setEventos(lista);
-		// Antes de realizar qualquer ação verifica se existe bloqueio pra empresa na sefaz
-		if (!empresa.existeBloqueioParaEvento()) {
+			debug("empresa.executarEventoManifesto(): " + empresa.executarEventoManifesto());
 
-			debug("não existe bloqueio para a empresa " + empresa);
+			// Antes de realizar qualquer ação verifica a data da próxima execucão
+			if (empresa.executarEventoManifesto()) {
 
-			DistDFeInt dist = new ObjectFactory().createDistDFeInt();
-			dist.setVersao("1.00");// FIXME verificar se é possível parametrizar e se vale a pena já que quando uma
-									// versão é
-									// alterada normalmente se precisa mexer no sistema.
-			dist.setTpAmb(ambiente.getTpAmb());
-			dist.setCUFAutor(empresa.getUf().getCodigo());
-			dist.setCNPJ(empresa.getCnpj());
+				//configura que a empresa está sendo processada para os eventos da sefaz
+//				empresa.getAgendamentoSefaz().setEmExecucao(true);
+//				empresa.getAgendamentoSefaz().setBloqueio(false);
+//				empresa = empresaService.atualizarEmpresa(tenant, empresa);
 
-			DistNSU distNSU = new ObjectFactory().createDistDFeIntDistNSU();
-			String nsu = StringUtils.leftPad(String.valueOf(empresa.getUltimoNSU().getUltimoNSU()), 15, "0");
-			distNSU.setUltNSU(nsu);
-			dist.setDistNSU(distNSU);
+				debug("executando manifesto para a empresa " + empresa);
 
-			OMElement ome = AXIOMUtil.stringToOM(JaxbUtils.convertEntityToXML(dist, false));
+				DistDFeInt dist = new ObjectFactory().createDistDFeInt();
+				dist.setVersao("1.00");// FIXME verificar se é possível parametrizar e se vale a pena já que quando uma
+										// versão é
+										// alterada normalmente se precisa mexer no sistema.
+				dist.setTpAmb(ambiente.getTpAmb());
+				dist.setCUFAutor(empresa.getUf().getCodigo());
+				dist.setCNPJ(empresa.getCnpj());
 
-			NfeDadosMsg_type0 dadosMsg = new NfeDadosMsg_type0();
-			dadosMsg.setExtraElement(ome);
+				DistNSU distNSU = new ObjectFactory().createDistDFeIntDistNSU();
+				String nsu = StringUtils.leftPad(String.valueOf(empresa.getUltimoNSU().getUltimoNSU()), 15, "0");
+				distNSU.setUltNSU(nsu);
+				dist.setDistNSU(distNSU);
 
-			NfeDistDFeInteresse distDFeInteresse = new NfeDistDFeInteresse();
-			distDFeInteresse.setNfeDadosMsg(dadosMsg);
+				OMElement ome = AXIOMUtil.stringToOM(JaxbUtils.convertEntityToXML(dist, false));
 
-			debug("invocando sefaz " + tenant + "|" + empresa);
+				NfeDadosMsg_type0 dadosMsg = new NfeDadosMsg_type0();
+				dadosMsg.setExtraElement(ome);
 
-			com.dgreentec.domain.xsd.retDistDFeInt_v101.RetDistDFeInt retorno = callService(dist, distDFeInteresse, ambiente,
-					empresa.getCertificado().getX509Certificate(), empresa.getCertificado().getPrivateKey());
+				NfeDistDFeInteresse distDFeInteresse = new NfeDistDFeInteresse();
+				distDFeInteresse.setNfeDadosMsg(dadosMsg);
 
-			response.setMaxNSu(retorno.getMaxNSU());
-			response.setUltimoNSu(retorno.getUltNSU());
+				debug("invocando sefaz " + tenant + "|" + empresa);
 
-			debug("retorno sefaz " + tenant + "|" + empresa);
+				com.dgreentec.domain.xsd.retDistDFeInt_v101.RetDistDFeInt retorno = callService(dist, distDFeInteresse, ambiente,
+						empresa.getCertificado().getX509Certificate(), empresa.getCertificado().getPrivateKey());
 
-			if (retorno.getCStat().equalsIgnoreCase(ConstantesNFe.RETORNO_EVENTO_MANIFESTO_138)) {
-				empresa = empresaService.consultarEmpresaPorCnpj(tenant, empresa.getCnpj());
-				LoteDistDFeInt loteDistDFeInt = retorno.getLoteDistDFeInt();
-				UltimoEventoNSU ultimo = new UltimoEventoNSU();
-				ultimo.setDataUltimoNSU(NFeDateUtils.converterData(retorno.getDhResp()));
-				ultimo.setUltimoNSU(NumberUtils.toLong(retorno.getUltNSU()));
+				response.setMaxNSu(retorno.getMaxNSU());
+				response.setUltimoNSu(retorno.getUltNSU());
 
-				empresa.setUltimoNSU(ultimo);
-				empresa.setBloqueioSefaz(null);
+				debug("retorno sefaz " + tenant + "|" + empresa);
 
-				List<DocZip> docZip = loteDistDFeInt.getDocZips();
-				// o conteudo do arquivo vem zipado, é preciso descompactar com gzip
+				if (retorno.getCStat().equalsIgnoreCase(ConstantesNFe.RETORNO_EVENTO_MANIFESTO_138)) {
+//					empresa = empresaService.consultarEmpresaPorCnpj(tenant, empresa.getCnpj());
+					LoteDistDFeInt loteDistDFeInt = retorno.getLoteDistDFeInt();
+					UltimoEventoNSU ultimo = new UltimoEventoNSU();
+					ultimo.setDataUltimoNSU(NFeDateUtils.converterData(retorno.getDhResp()));
+					ultimo.setUltimoNSU(NumberUtils.toLong(retorno.getUltNSU()));
 
-				debug("processando docZip " + tenant + "|" + empresa + "[" + docZip.size() + "]");
+					empresa.setUltimoNSU(ultimo);
 
-				for (DocZip dzip : docZip) {
-					SchemaEnum schema = SchemaEnum.fromSchemaName(dzip.getSchema());
-					String xml = GzipUtils.decompress(dzip.getValue());
-					EventoDocumento evDoc = new EventoDocumento();
-					evDoc.setNsu(dzip.getNSU());
-					evDoc.setSchema(schema);
-					evDoc.setXml(xml);
-					switch (schema) {
-					case RESNFE: {
-						// resumo de NFe, representam notas que foram emitidas para o cnpj mas que não foram
-						// manifestadas pelo destinatário.
-						ResNFe resNFe = JaxbUtils.convertStringXMLToEntity(xml, ResNFe.class);
-						// os resumos de nfe devem ser manifestados manifestar conhecimento da NFe para permitir o
-						// download
-						// futuramente.
-						evDoc.setJaxbObject(resNFe);
-						break;
+					List<DocZip> docZip = loteDistDFeInt.getDocZips();
+					// o conteudo do arquivo vem zipado, é preciso descompactar com gzip
+
+					debug("processando docZip " + tenant + "|" + empresa + "[" + docZip.size() + "]");
+
+					for (DocZip dzip : docZip) {
+						SchemaEnum schema = SchemaEnum.fromSchemaName(dzip.getSchema());
+						String xml = GzipUtils.decompress(dzip.getValue());
+						EventoDocumento evDoc = new EventoDocumento();
+						evDoc.setNsu(dzip.getNSU());
+						evDoc.setSchema(schema);
+						evDoc.setXml(xml);
+						switch (schema) {
+						case RESNFE: {
+							// resumo de NFe, representam notas que foram emitidas para o cnpj mas que não foram
+							// manifestadas pelo destinatário.
+							ResNFe resNFe = JaxbUtils.convertStringXMLToEntity(xml, ResNFe.class);
+							// os resumos de nfe devem ser manifestados manifestar conhecimento da NFe para permitir o
+							// download
+							// futuramente.
+							evDoc.setJaxbObject(resNFe);
+							break;
+						}
+						case NFEPROC: {
+							// resultado do processamento da NFe. Contém a nota e assinatura. Tag raiz nfeProc
+							NfeProc nfeProc = JaxbUtils.convertStringXMLToEntity(xml, NfeProc.class);
+							// guardar a NFe na base/filesystem ...
+							evDoc.setJaxbObject(nfeProc);
+							break;
+						}
+						case RESEVENTO: {
+							// resumo de evento
+							ResEvento resEvento = JaxbUtils.convertStringXMLToEntity(xml, ResEvento.class);
+							evDoc.setJaxbObject(resEvento);
+							break;
+						}
+						case PROCEVENTONFE: {
+							// resultado do processamento de um evento
+							ProcEventoNFe procEventoNFe = JaxbUtils.convertStringXMLToEntity(xml, ProcEventoNFe.class);
+							evDoc.setJaxbObject(procEventoNFe);
+							break;
+						}
+						}
+
+						// TODO registar cada evento na empresa
+						EventoNSU eventoNSU = new EventoNSU();
+						eventoNSU.setIdNsu(evDoc.getNsu());
+						eventoNSU.setDtNSU(new Date());
+						eventoNSU.setSchema(evDoc.getSchema());
+						eventoNSU.setEmpresa(empresa);
+
+						empresa.adicionarNSU(eventoNSU);
+
+						lista.add(evDoc);
 					}
-					case NFEPROC: {
-						// resultado do processamento da NFe. Contém a nota e assinatura. Tag raiz nfeProc
-						NfeProc nfeProc = JaxbUtils.convertStringXMLToEntity(xml, NfeProc.class);
-						// guardar a NFe na base/filesystem ...
-						evDoc.setJaxbObject(nfeProc);
-						break;
-					}
-					case RESEVENTO: {
-						// resumo de evento
-						ResEvento resEvento = JaxbUtils.convertStringXMLToEntity(xml, ResEvento.class);
-						evDoc.setJaxbObject(resEvento);
-						break;
-					}
-					case PROCEVENTONFE: {
-						// resultado do processamento de um evento
-						ProcEventoNFe procEventoNFe = JaxbUtils.convertStringXMLToEntity(xml, ProcEventoNFe.class);
-						evDoc.setJaxbObject(procEventoNFe);
-						break;
-					}
-					}
+				} else if (retorno.getCStat().equalsIgnoreCase(ConstantesNFe.RETORNO_EVENTO_MANIFESTO_137)) {
+					// não houve documentos
+					logger.warn("não houve documentos para recuperar [" + retorno.getCStat() + ":" + retorno.getXMotivo()
+							+ "] para a empresa " + empresa.getCnpj() + " - " + empresa.getNome());
 
-					// TODO registar cada evento na empresa
-					EventoNSU eventoNSU = new EventoNSU();
-					eventoNSU.setIdNsu(evDoc.getNsu());
-					eventoNSU.setDtNSU(new Date());
-					eventoNSU.setSchema(evDoc.getSchema());
-					eventoNSU.setCodCNPJ(empresa.getCnpj());
-					empresa.adicionarNSU(eventoNSU);
+					// após um código 137 a SEFAZ recomenda aguardar em torno de 1 hora antes de realizar a nova chamada, do
+					// contrário corre-se o risco de cair numa "lista negra".
 
-					lista.add(evDoc);
+					// Guadar para a empresa uma flag informando que só após 1 hora poderá consultar novamente
+					AgendamentoSefaz agendamento = new AgendamentoSefaz();
+					agendamento.setDtCadastroAgendamento(LocalDateTime.now());
+					LocalDateTime next = LocalDateTime.now();
+					next = next.plusHours(1);
+					agendamento.setProximaExecucao(next);
+					agendamento.setTextoAgendamento("Agendamento por bloqueio código 137");
+					agendamento.setBloqueio(true);
+					empresa.setAgendamentoSefaz(agendamento);
+
+				} else {
+					//TODO o que fazer???
+					logger.error("RETORNO DESCONHECIDO [" + retorno.getCStat() + ":" + retorno.getXMotivo() + "] Não processou a empresa "
+							+ empresa.getCnpj() + " - " + empresa.getNome());
+
 				}
-			} else if (retorno.getCStat().equalsIgnoreCase(ConstantesNFe.RETORNO_EVENTO_MANIFESTO_137)) {
-				// não houve documentos
-				logger.warn("não houve documentos para recuperar [" + retorno.getCStat() + ":" + retorno.getXMotivo() + "] para a empresa "
-						+ empresa.getCnpj() + " - " + empresa.getNome());
 
-				//				empresa = empresaService.consultarEmpresaPorCnpj(empresa.getContrato(), empresa.getCnpj());
+				// FIXME - processa os ventos aqui? envia por evento cdi? faz chamadas recursivas até receber todos os NSUs?
+//				empresa = empresaService.atualizarEmpresa(tenant, empresa);
 
-				// após um código 137 a SEFAZ recomenda aguardar em torno de 1 hora antes de realizar a nova chamada, do
-				// contrário corre-se o risco de cair numa "lista negra".
+//				empresa = empresaService.consultarEmpresaPorCnpj(tenant, empresa.getCnpj());
 
-				// Guadar para a empresa uma flag informando que só após 1 hora poderá consultar novamente
-				BloqueioSefaz bloqueio = new BloqueioSefaz();
-				Calendar c = GregorianCalendar.getInstance();
-				c.add(Calendar.HOUR_OF_DAY, 1);
-				bloqueio.setDtCadastroBloqueio(new Date());
-				bloqueio.setDtExpiracao(c.getTime());
-				empresa.setBloqueioSefaz(bloqueio);
-
-				//				empresaService.atualizarEmpresa(empresa.getContrato(), empresa);
-
+				debug("finalizou processo com a empresa "+empresa);
 			} else {
-				//TODO o que fazer???
-				logger.error("RETORNO DESCONHECIDO [" + retorno.getCStat() + ":" + retorno.getXMotivo() + "] Não processou a empresa "
-						+ empresa.getCnpj() + " - " + empresa.getNome());
-
+				//não é pra executar
+				debug("EXECUÇÃO AGENDADA PARA " + empresa.getAgendamentoSefaz().getProximaExecucao());
 			}
-
-			// FIXME - processa os ventos aqui? envia por evento cdi? faz chamadas recursivas até receber todos os NSUs?
-			empresa = empresaService.atualizarEmpresa(tenant, empresa);
+			return response;
+		} catch (Exception e) {
+			StringWriter sw = new StringWriter();
+			e.printStackTrace(new PrintWriter(sw));
+			debug("ERRO \n" + sw.toString() + "\n");
+			logger.error(e.getMessage(), e);
+			throw e;
 		}
-		return response;
 	}
 
 	private com.dgreentec.domain.xsd.retDistDFeInt_v101.RetDistDFeInt callService(DistDFeInt dist, NfeDistDFeInteresse distDFeInteresse,

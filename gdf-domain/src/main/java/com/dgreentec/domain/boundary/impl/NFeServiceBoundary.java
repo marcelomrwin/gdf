@@ -97,8 +97,6 @@ public class NFeServiceBoundary extends AbstractBoundary implements NFeService {
 	@Inject
 	private LoteEventoService loteEventoService;
 
-	//	@Inject	@Any protected Instance<ProcessadorEventoDocumentoEmpresa> processadorEventoInstance;
-
 	@Inject
 	protected LogEventoNotificacaoService logEventoNotificacaoService;
 
@@ -113,6 +111,8 @@ public class NFeServiceBoundary extends AbstractBoundary implements NFeService {
 
 		for (final Empresa empresa : empresas) {
 			try {
+
+
 				processarEventosPorEmpresa(tenant, contrato, empresa, ambiente);
 			} catch (Throwable e) {
 				throw new NfeException(e);
@@ -132,8 +132,14 @@ public class NFeServiceBoundary extends AbstractBoundary implements NFeService {
 
 	@Asynchronous
 	@Override
-	public void processarEventosPorEmpresa(Tenant tenant, final Contrato contrato, Empresa empresa, TipoAmbienteEnum ambiente)
+	public void processarEventosPorEmpresa(Tenant tenant, final Contrato contrato, Empresa pEmpresa, TipoAmbienteEnum ambiente)
 			throws NfeException {
+//TODO o agendador ao passar pela empresa deve verificar o atributo em execução. Nenhuma empresa que contenha este atributo deve ser incluida na lista para atualizar.
+		pEmpresa.getAgendamentoSefaz().setEmExecucao(true);
+		pEmpresa.getAgendamentoSefaz().setBloqueio(false);
+
+		Empresa empresa = empresaService.atualizarEmpresa(tenant, pEmpresa);
+
 		EventoDocumentoResponse eventosDaEmpresa = null;
 		do {
 			debug("Fez pesquisa! [" + tenant + "]" + empresa);
@@ -189,7 +195,16 @@ public class NFeServiceBoundary extends AbstractBoundary implements NFeService {
 			manifestarEventosCienciaDocumentoResumo(tenant, contrato, resumos, empresa, ambiente);
 
 		} while (eventosDaEmpresa.possuiEventoRestante());
-		debug("Encerrando fez pesquisa! " + tenant + " - " + empresa);
+
+		//agenda para o tempo configurado para a próxima execução
+		if (!empresa.getAgendamentoSefaz().getBloqueio()) {
+			//5 minutos
+			empresa.agendarEventoSefaz(TimeUnit.MINUTES, 5);
+			empresa.getAgendamentoSefaz().setEmExecucao(false);
+			empresa = empresaService.atualizarEmpresa(tenant, empresa);
+		}
+
+		debug("Encerrando a busca para " + tenant + " - " + empresa);
 	}
 
 	@Override

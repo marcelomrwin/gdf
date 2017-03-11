@@ -5,14 +5,18 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
 
 import com.dgreentec.infrastructure.model.AbstractEntityVersion;
 import com.dgreentec.infrastructure.model.SchemaEnum;
@@ -26,14 +30,6 @@ public class EventoNSU extends AbstractEntityVersion {
 		super();
 	}
 
-	public EventoNSU(Long idNsu, String codCNPJ, Date dtNSU, SchemaEnum schema) {
-		super();
-		this.idNsu = idNsu;
-		this.codCNPJ = codCNPJ;
-		this.dtNSU = dtNSU;
-		this.schema = schema;
-	}
-
 	private static final long serialVersionUID = 7592541899670910173L;
 
 	@Id
@@ -45,9 +41,6 @@ public class EventoNSU extends AbstractEntityVersion {
 	@Column(name = "ID_NSU")
 	private Long idNsu;
 
-	@Column(name = "COD_CNPJ")
-	private String codCNPJ;
-
 	@Column(name = "DT_NSU", columnDefinition = "timestamp without time zone", nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dtNSU = new Date();
@@ -58,6 +51,11 @@ public class EventoNSU extends AbstractEntityVersion {
 
 	@Column(name = "TXT_OBSERVACAO", length = 500)
 	private String observacao;
+
+	@ManyToOne
+	@JoinColumn(name = "COD_CNPJ", foreignKey = @ForeignKey(name = "FK_EVENTO_EMPRESA"))
+	@NotNull
+	private Empresa empresa;
 
 	public Long getIdNsu() {
 		return idNsu;
@@ -99,20 +97,20 @@ public class EventoNSU extends AbstractEntityVersion {
 		this.idEventoNsu = idEventoNsu;
 	}
 
-	public String getCodCNPJ() {
-		return codCNPJ;
+	public Empresa getEmpresa() {
+		return empresa;
 	}
 
-	public void setCodCNPJ(String codCNPJ) {
-		this.codCNPJ = codCNPJ;
+	public void setEmpresa(Empresa empresa) {
+		this.empresa = empresa;
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((codCNPJ == null) ? 0 : codCNPJ.hashCode());
 		result = prime * result + ((dtNSU == null) ? 0 : dtNSU.hashCode());
+		result = prime * result + ((empresa == null) ? 0 : empresa.hashCode());
 		result = prime * result + ((idEventoNsu == null) ? 0 : idEventoNsu.hashCode());
 		result = prime * result + ((idNsu == null) ? 0 : idNsu.hashCode());
 		result = prime * result + ((observacao == null) ? 0 : observacao.hashCode());
@@ -122,40 +120,72 @@ public class EventoNSU extends AbstractEntityVersion {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (!(obj instanceof EventoNSU)) {
 			return false;
+		}
 		EventoNSU other = (EventoNSU) obj;
-		if (codCNPJ == null) {
-			if (other.codCNPJ != null)
-				return false;
-		} else if (!codCNPJ.equals(other.codCNPJ))
-			return false;
 		if (dtNSU == null) {
-			if (other.dtNSU != null)
+			if (other.dtNSU != null) {
 				return false;
-		} else if (!dtNSU.equals(other.dtNSU))
+			}
+		} else if (!dtNSU.equals(other.dtNSU)) {
 			return false;
+		}
+		if (empresa == null) {
+			if (other.empresa != null) {
+				return false;
+			}
+		} else if (!empresa.equals(other.empresa)) {
+			return false;
+		}
 		if (idEventoNsu == null) {
-			if (other.idEventoNsu != null)
+			if (other.idEventoNsu != null) {
 				return false;
-		} else if (!idEventoNsu.equals(other.idEventoNsu))
+			}
+		} else if (!idEventoNsu.equals(other.idEventoNsu)) {
 			return false;
+		}
 		if (idNsu == null) {
-			if (other.idNsu != null)
+			if (other.idNsu != null) {
 				return false;
-		} else if (!idNsu.equals(other.idNsu))
+			}
+		} else if (!idNsu.equals(other.idNsu)) {
 			return false;
+		}
 		if (observacao == null) {
-			if (other.observacao != null)
+			if (other.observacao != null) {
 				return false;
-		} else if (!observacao.equals(other.observacao))
+			}
+		} else if (!observacao.equals(other.observacao)) {
 			return false;
-		if (schema != other.schema)
+		}
+		if (schema != other.schema) {
 			return false;
+		}
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("EventoNSU [");
+		if (idEventoNsu != null)
+			builder.append("idEventoNsu=").append(idEventoNsu).append(", ");
+		if (idNsu != null)
+			builder.append("idNsu=").append(idNsu).append(", ");
+		if (dtNSU != null)
+			builder.append("dtNSU=").append(dtNSU).append(", ");
+		if (schema != null)
+			builder.append("schema=").append(schema).append(", ");
+		if (observacao != null)
+			builder.append("observacao=").append(observacao);
+		builder.append("]");
+		return builder.toString();
 	}
 }
